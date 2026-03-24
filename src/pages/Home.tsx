@@ -4,7 +4,7 @@ import {
   ArrowRight, Users, Timer, Zap, Shield, Globe, ChevronDown,
   BookOpen, Smartphone, Clock, CheckCircle2, XCircle, Gamepad2,
   Languages, Wifi, WifiOff, Sparkles, Play, Star,
-  UserCog, MonitorSmartphone
+  UserCog, MonitorSmartphone, Plus
 } from 'lucide-react'
 import { useI18n, LANGUAGES, LangCode } from '../i18n'
 import { getGames } from '../games/registry'
@@ -65,6 +65,9 @@ export default function Home() {
                 </>
               )}
             </div>
+            <Link to="/contribute" className="text-text-secondary hover:text-accent text-sm transition-colors hidden sm:inline">
+              {L('Добавить игру', 'Add a Game')}
+            </Link>
             <Link to="/catalog" className="btn-primary text-sm py-2 px-4">
               {t.landing.hero_cta}
             </Link>
@@ -107,27 +110,26 @@ export default function Home() {
             </div>
           </motion.div>
 
-          {/* Floating game emojis */}
-          <div className="hidden md:block">
-            {['🎭', '💬', '🐊', '🕵️', '🧠', '🏚️', '🎩', '🎨', '🎯', '🔮'].map((emoji, i) => (
-              <motion.span key={i}
-                className="absolute text-2xl opacity-20"
-                style={{
-                  left: `${10 + (i % 5) * 20}%`,
-                  top: `${20 + Math.floor(i / 5) * 50}%`,
-                }}
-                animate={{
-                  y: [0, -10, 0],
-                  rotate: [0, 5, -5, 0],
-                }}
-                transition={{
-                  duration: 4 + i * 0.5,
-                  repeat: Infinity,
-                  delay: i * 0.3,
-                }}>
-                {emoji}
-              </motion.span>
-            ))}
+          {/* Floating game emojis — edges only, no overlap with text */}
+          <div className="hidden lg:block pointer-events-none">
+            {['🎭', '💬', '🐊', '🕵️', '🧠', '🏚️', '🎩', '🎨', '🎯', '🔮'].map((emoji, i) => {
+              const positions = [
+                { left: '2%', top: '15%' }, { right: '3%', top: '12%' },
+                { left: '5%', top: '45%' }, { right: '6%', top: '40%' },
+                { left: '1%', top: '75%' }, { right: '2%', top: '72%' },
+                { left: '8%', bottom: '15%' }, { right: '8%', bottom: '18%' },
+                { left: '3%', bottom: '40%' }, { right: '4%', bottom: '35%' },
+              ]
+              return (
+                <motion.span key={i}
+                  className="absolute text-2xl opacity-[0.08]"
+                  style={positions[i]}
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ duration: 5 + i * 0.5, repeat: Infinity, delay: i * 0.4 }}>
+                  {emoji}
+                </motion.span>
+              )
+            })}
           </div>
         </div>
 
@@ -521,6 +523,40 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════════════════════════════ */}
+      {/* OPEN SOURCE — star CTA */}
+      {/* ═══════════════════════════════════════════ */}
+      <section className="py-16 sm:py-20 border-t border-border/50">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <motion.div {...fadeUp}>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-bg-surface border border-border mb-6">
+              <Star size={16} className="text-amber-400" />
+              <span className="text-sm text-text-secondary">Open Source</span>
+            </div>
+            <h3 className="text-2xl font-bold mb-3">
+              {L('Поставьте звезду на GitHub', 'Star us on GitHub')}
+            </h3>
+            <p className="text-text-muted text-sm mb-6 max-w-md mx-auto">
+              {L(
+                'GameStol — проект с открытым кодом. Звезда помогает другим найти проект.',
+                'GameStol is open source. A star helps others discover the project.'
+              )}
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a href="https://github.com/egorfedorov/gamestol" target="_blank" rel="noopener"
+                className="btn-secondary px-6 py-3 gap-2">
+                <Star size={16} className="text-amber-400" />
+                {L('Поставить звезду', 'Star on GitHub')}
+              </a>
+              <Link to="/contribute" className="btn-ghost text-sm">
+                <Plus size={16} />
+                {L('Добавить игру', 'Add a Game')}
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════ */}
       {/* FOOTER */}
       {/* ═══════════════════════════════════════════ */}
       <footer className="py-10 border-t border-border">
@@ -533,9 +569,13 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-4">
               <a href="https://github.com/egorfedorov/gamestol" target="_blank" rel="noopener"
-                className="text-text-muted hover:text-text text-sm transition-colors">
+                className="flex items-center gap-1.5 text-text-muted hover:text-amber-400 text-sm transition-colors">
+                <Star size={13} />
                 GitHub
               </a>
+              <Link to="/contribute" className="text-text-muted hover:text-text text-sm transition-colors">
+                {L('Добавить игру', 'Add a Game')}
+              </Link>
               <Link to="/catalog" className="text-text-muted hover:text-accent text-sm transition-colors">
                 {t.nav.catalog}
               </Link>
