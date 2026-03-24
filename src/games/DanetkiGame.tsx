@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { Play, Eye, EyeOff, Lightbulb, ChevronRight, RotateCcw, Check, X, Minus, UserCog, BookOpen, MessageCircleQuestion } from 'lucide-react'
 import { useI18n } from '../i18n'
+import { useGameText } from '../hooks/useGameText'
 import { danetkiStories } from '../data/danetki'
 
 type Phase = 'setup' | 'playing' | 'solved' | 'end'
 
 export default function DanetkiGame() {
   const { t, lang } = useI18n()
+  const G = useGameText()
   const L = (ru: string, en: string) => lang === 'ru' ? ru : en
 
   const [phase, setPhase] = useState<Phase>('setup')
@@ -88,14 +90,14 @@ export default function DanetkiGame() {
           </h2>
           <span className="badge text-amber-400 bg-amber-400/10">
             <UserCog size={12} className="mr-1" />
-            {L('Ведущий', 'Host')}
+            {G('host')}
           </span>
         </div>
 
         {/* ═══ How it works ═══ */}
         <div className="card p-4 text-sm text-text-secondary space-y-1">
           <p className="font-medium text-text mb-2">
-            {L('Как это работает:', 'How it works:')}
+            {G('how_it_works')}
           </p>
           <p>{L(
             '1. Вы — ведущий. Зачитайте ситуацию вслух',
@@ -118,10 +120,7 @@ export default function DanetkiGame() {
         {/* ═══ Game info ═══ */}
         <div className="card p-4 text-sm text-text-secondary flex items-center gap-3">
           <BookOpen size={18} className="text-accent shrink-0" />
-          <p>{L(
-            `${stories.length} загадочных историй готовы к игре`,
-            `${stories.length} mystery stories ready to play`
-          )}</p>
+          <p>{`${stories.length} ${G('stories_ready')}`}</p>
         </div>
 
         <button
@@ -143,7 +142,7 @@ export default function DanetkiGame() {
         <div className="flex items-center justify-between">
           <span className="game-phase-indicator">
             <BookOpen size={16} />
-            {L('История', 'Story')} {currentIndex + 1}/{stories.length}
+            {G('story')} {currentIndex + 1}/{stories.length}
           </span>
           <span className="text-xs text-text-muted">
             <MessageCircleQuestion size={12} className="inline mr-1" />
@@ -154,7 +153,7 @@ export default function DanetkiGame() {
         {/* ═══ Read aloud section ═══ */}
         <div className="card p-5 border-accent/20">
           <p className="text-xs text-accent font-medium uppercase tracking-wider mb-3">
-            {L('Прочитайте вслух:', 'Read this aloud:')}
+            {G('read_aloud')}
           </p>
           <h3 className="font-semibold text-lg mb-3">{current.title}</h3>
           <p className="text-base leading-relaxed italic">
@@ -166,7 +165,7 @@ export default function DanetkiGame() {
         {hintsUsed > 0 && (
           <div className="space-y-2">
             <p className="text-xs text-text-muted">
-              {L('Подсказки (только для ведущего):', 'Hints (host only):')}
+              {G('hints_host_only')}
             </p>
             {current.hints.slice(0, hintsUsed).map((hint, i) => (
               <div key={i} className="card p-3 border-amber-500/20 bg-amber-500/5">
@@ -184,7 +183,7 @@ export default function DanetkiGame() {
           <div className="card p-5 border-emerald-500/20 bg-emerald-500/5">
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs text-emerald-400 font-medium uppercase tracking-wider">
-                {L('Ответ (только для ведущего):', 'Answer (host only):')}
+                {G('answer_host_only')}
               </p>
               <button onClick={hideAnswer} className="text-text-muted hover:text-text p-1">
                 <EyeOff size={14} />
@@ -197,7 +196,7 @@ export default function DanetkiGame() {
         {/* ═══ Answer player questions ═══ */}
         <div>
           <p className="text-text-muted text-xs text-center mb-3">
-            {L('Ответьте на вопрос игрока:', 'Answer the player\'s question:')}
+            {G('answer_question')}
           </p>
           <div className="grid grid-cols-3 gap-2">
             <button
@@ -238,12 +237,12 @@ export default function DanetkiGame() {
           {!showAnswer ? (
             <button onClick={revealAnswer} className="btn-secondary flex-1 py-5 text-sm touch-manipulation">
               <Eye size={16} />
-              {L('Показать ответ', 'Show Answer')}
+              {G('show_answer')}
             </button>
           ) : (
             <button onClick={hideAnswer} className="btn-secondary flex-1 py-5 text-sm touch-manipulation">
               <EyeOff size={16} />
-              {L('Скрыть ответ', 'Hide Answer')}
+              {G('hide_answer')}
             </button>
           )}
         </div>
@@ -251,7 +250,7 @@ export default function DanetkiGame() {
         {/* ═══ Mark solved ═══ */}
         <div className="card p-4 border-border">
           <p className="text-text-muted text-xs mb-3 text-center">
-            {L('Игроки разгадали историю?', 'Did the players solve it?')}
+            {G('did_solve')}
           </p>
           <div className="grid grid-cols-2 gap-3">
             <button
@@ -259,14 +258,14 @@ export default function DanetkiGame() {
               className="btn-secondary py-5 text-sm touch-manipulation"
             >
               <X size={16} />
-              {L('Не разгадали', 'Not solved')}
+              {G('not_solved')}
             </button>
             <button
               onClick={() => markSolved(true)}
               className="btn-primary py-5 text-sm touch-manipulation"
             >
               <Check size={16} />
-              {L('Разгадали!', 'Solved!')}
+              {G('solved')}
             </button>
           </div>
         </div>
@@ -282,21 +281,21 @@ export default function DanetkiGame() {
       <div className="space-y-6 text-center">
         <div className="card p-6">
           <p className="text-text-muted text-sm mb-2">
-            {L('Статистика', 'Stats')}
+            {G('stats')}
           </p>
           <p className="text-3xl font-bold font-mono text-accent">{solved}/{totalPlayed}</p>
           <p className="text-text-muted text-xs mt-1">
-            {L('историй разгадано', 'stories solved')}
+            {G('stories_solved')}
           </p>
         </div>
 
         {/* ═══ Read aloud — reveal ═══ */}
         <div className="card p-5 border-accent/20">
           <p className="text-xs text-accent font-medium uppercase tracking-wider mb-3">
-            {L('Прочитайте вслух:', 'Read this aloud:')}
+            {G('read_aloud')}
           </p>
           <p className="text-sm leading-relaxed italic">
-            &laquo;{L('Разгадка:', 'The answer was:')} {current.answer}&raquo;
+            &laquo;{G('the_answer_was')} {current.answer}&raquo;
           </p>
         </div>
 
@@ -306,7 +305,7 @@ export default function DanetkiGame() {
             className="btn-primary w-full py-5 text-lg touch-manipulation"
           >
             <ChevronRight size={20} />
-            {L('Следующая история', 'Next Story')}
+            {G('next_story')}
           </button>
         ) : (
           <button
@@ -333,13 +332,10 @@ export default function DanetkiGame() {
             {solved}/{totalPlayed}
           </p>
           <p className="text-text-secondary">
-            {L('историй разгадано', 'stories solved')}
+            {G('stories_solved')}
           </p>
           <p className="text-text-muted text-xs mt-2">
-            {L(
-              `Задано вопросов за всю игру: ${totalQuestions}`,
-              `Total questions asked: ${totalQuestions}`
-            )}
+            {`${G('total_questions_asked')}: ${totalQuestions}`}
           </p>
         </div>
 

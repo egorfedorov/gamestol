@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Plus, Minus, RotateCcw, Trophy, SkipForward } from 'lucide-react'
 import { useI18n } from '../i18n'
+import { useGameText } from '../hooks/useGameText'
 import PlayerSetup from '../components/PlayerSetup'
 import { Player } from '../types'
 import clsx from 'clsx'
@@ -10,6 +11,7 @@ type Phase = 'setup' | 'playing' | 'end'
 export default function ImaginariumGame() {
   const { t, lang } = useI18n()
   const L = (ru: string, en: string) => lang === 'ru' ? ru : en
+  const G = useGameText('imaginarium')
 
   const [phase, setPhase] = useState<Phase>('setup')
   const [players, setPlayers] = useState<Player[]>([])
@@ -63,46 +65,37 @@ export default function ImaginariumGame() {
   if (phase === 'setup') {
     return (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold">{L('Имаджинариум', 'Imaginarium')}</h2>
+        <h2 className="text-2xl font-bold">{G('title')}</h2>
 
         <div className="card p-4 text-sm text-text-secondary space-y-1">
-          <p className="font-medium text-text mb-2">{L('Как играть:', 'How to play:')}</p>
-          <p>1. {L('Рассказчик загадывает ассоциацию к своей карте', 'The storyteller gives a clue for their card')}</p>
-          <p>2. {L('Остальные выбирают из своих карт самую подходящую', 'Others pick the card from their hand that best matches')}</p>
-          <p>3. {L('Все карты перемешиваются, игроки голосуют', 'All cards are shuffled, players vote')}</p>
-          <p>4. {L('Очки начисляются по результатам голосования', 'Points are awarded based on the votes')}</p>
+          <p className="font-medium text-text mb-2">{G('how_to_play')}</p>
+          <p>1. {G('rule_1')}</p>
+          <p>2. {G('rule_2')}</p>
+          <p>3. {G('rule_3')}</p>
+          <p>4. {G('rule_4')}</p>
         </div>
 
         <div className="card p-4 text-sm text-text-secondary space-y-2">
-          <p className="font-medium text-text">{L('Подсчёт очков:', 'Scoring rules:')}</p>
-          <p className="text-text-muted">{L(
-            '═══ Если ВСЕ или НИКТО не угадал карту рассказчика:',
-            '═══ If ALL or NONE guessed the storyteller\'s card:'
-          )}</p>
-          <p>{L('Рассказчик: 0 очков', 'Storyteller: 0 points')}</p>
-          <p>{L('Все остальные: +2 очка', 'Everyone else: +2 points')}</p>
-          <p className="text-text-muted mt-1">{L(
-            '═══ Если угадали НЕКОТОРЫЕ:',
-            '═══ If SOME guessed correctly:'
-          )}</p>
-          <p>{L('Рассказчик: +3 очка', 'Storyteller: +3 points')}</p>
-          <p>{L('Каждый угадавший: +3 очка', 'Each correct guesser: +3 points')}</p>
-          <p className="text-text-muted mt-1">{L(
-            '═══ Бонус:',
-            '═══ Bonus:'
-          )}</p>
-          <p>{L('За каждый голос за ВАШУ карту (не рассказчик): +1 очко', 'For each vote on YOUR card (non-storyteller): +1 point')}</p>
+          <p className="font-medium text-text">{G('scoring_rules')}</p>
+          <p className="text-text-muted">{G('scoring_all_none')}</p>
+          <p>{G('scoring_storyteller_0')}</p>
+          <p>{G('scoring_others_2')}</p>
+          <p className="text-text-muted mt-1">{G('scoring_some')}</p>
+          <p>{G('scoring_storyteller_3')}</p>
+          <p>{G('scoring_guesser_3')}</p>
+          <p className="text-text-muted mt-1">{G('scoring_bonus')}</p>
+          <p>{G('scoring_vote_bonus')}</p>
         </div>
 
         <PlayerSetup players={players} onChange={setPlayers} min={3} max={8} />
 
         <div className="card p-4">
           <label className="text-sm text-text-secondary block mb-1">
-            {L('Цель', 'Target score')}: <span className="text-text font-mono">{targetScore}</span> {t.game.points}
+            {G('target_score')}: <span className="text-text font-mono">{targetScore}</span> {t.game.points}
           </label>
           {targetScore === recommendedScore ? (
             <p className="text-xs text-accent mb-2">
-              {L('Рекомендуемое значение', 'Recommended')}
+              {G('recommended')}
             </p>
           ) : (
             <p className="text-xs text-text-muted mb-2">
@@ -128,16 +121,16 @@ export default function ImaginariumGame() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <span className="game-phase-indicator">
-            {L('Раунд', 'Round')} {round}
+            {G('round')} {round}
           </span>
           <span className="text-sm text-text-muted">
-            {L('Цель', 'Target')}: {targetScore}
+            {G('target')}: {targetScore}
           </span>
         </div>
 
         {/* Storyteller card */}
         <div className="card p-5 border-accent/20 text-center">
-          <p className="text-sm text-text-muted mb-1">{L('Рассказчик', 'Storyteller')}</p>
+          <p className="text-sm text-text-muted mb-1">{G('storyteller')}</p>
           <p className="text-xl font-bold text-accent">{storyteller.name}</p>
         </div>
 
@@ -176,7 +169,7 @@ export default function ImaginariumGame() {
 
         {/* Progress bar */}
         <div className="card p-4 space-y-2">
-          <p className="text-xs text-text-muted font-medium mb-1">{L('Прогресс', 'Progress')}</p>
+          <p className="text-xs text-text-muted font-medium mb-1">{G('progress')}</p>
           {players.map(p => (
             <div key={p.id} className="flex items-center gap-2 text-xs">
               <span className="w-16 truncate text-text-muted">{p.name}</span>
@@ -191,7 +184,7 @@ export default function ImaginariumGame() {
 
         <button onClick={nextRound}
           className="btn-primary w-full active:scale-[0.98] transition-transform touch-manipulation">
-          <SkipForward size={18} /> {L('Следующий раунд', 'Next Round')}
+          <SkipForward size={18} /> {G('next_round')}
         </button>
       </div>
     )
@@ -205,7 +198,7 @@ export default function ImaginariumGame() {
     return (
       <div className="space-y-6 text-center">
         <span className="game-phase-indicator mx-auto">
-          {L('Игра окончена', 'Game Over')}
+          {G('game_over')}
         </span>
 
         <h2 className="text-3xl font-bold">{t.game.congratulations}</h2>

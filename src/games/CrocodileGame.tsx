@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Play, SkipForward, Check, RotateCcw, Volume2, VolumeX, AlertCircle } from 'lucide-react'
 import { useI18n } from '../i18n'
+import { useGameText } from '../hooks/useGameText'
 import { useTimer } from '../hooks/useTimer'
 import PlayerSetup from '../components/PlayerSetup'
 import { Player } from '../types'
@@ -12,6 +13,7 @@ type Phase = 'setup' | 'ready' | 'playing' | 'result' | 'end'
 export default function CrocodileGame() {
   const { t, lang } = useI18n()
   const L = (ru: string, en: string) => lang === 'ru' ? ru : en
+  const G = useGameText()
 
   const [phase, setPhase] = useState<Phase>('setup')
   const [players, setPlayers] = useState<Player[]>([])
@@ -101,7 +103,7 @@ export default function CrocodileGame() {
         <h2 className="text-2xl font-bold">{L('Крокодил', 'Charades')}</h2>
 
         <div className="card p-4 text-sm text-text-secondary space-y-1">
-          <p className="font-medium text-text mb-2">{L('Как играть:', 'How to play:')}</p>
+          <p className="font-medium text-text mb-2">{G('how_to_play')}</p>
           <p>1. {L('Один показывает слово жестами', 'One player acts out a word')}</p>
           <p>2. {L('Остальные угадывают', 'Others try to guess')}</p>
           <p>3. {L('Нельзя: говорить, издавать звуки, показывать на предметы', 'No talking, sounds, or pointing at objects')}</p>
@@ -113,11 +115,11 @@ export default function CrocodileGame() {
         <div className="card p-4 space-y-4">
           <div>
             <label className="text-sm text-text-secondary block mb-1">
-              {L('Цель', 'Target')}: <span className="text-text font-mono">{targetScore}</span> {t.game.points}
+              {G('target')}: <span className="text-text font-mono">{targetScore}</span> {t.game.points}
             </label>
             {targetScore === recommendedScore ? (
               <p className="text-xs text-accent mb-2">
-                {L('Рекомендуемое значение', 'Recommended')}
+                {G('recommended')}
               </p>
             ) : (
               <p className="text-xs text-text-muted mb-2">
@@ -130,7 +132,7 @@ export default function CrocodileGame() {
           </div>
           <div>
             <label className="text-sm text-text-secondary block mb-2">
-              {L('Время', 'Time')}: <span className="text-text font-mono">{timerSeconds}</span> {L('сек', 'sec')}
+              {G('time')}: <span className="text-text font-mono">{timerSeconds}</span> {G('sec')}
             </label>
             <input type="range" min={30} max={120} step={10} value={timerSeconds}
               onChange={e => setTimerSeconds(Number(e.target.value))}
@@ -167,7 +169,7 @@ export default function CrocodileGame() {
           <p className="text-text-muted text-sm">
             {L('Показывает', 'Acting')}: <span className="text-accent font-medium">{players[currentPlayerIndex]?.name}</span>
           </p>
-          <p className="text-sm text-text-secondary mb-2">{t.game.your_word}:</p>
+          <p className="text-sm text-text-secondary mb-2">{G('your_word')}</p>
           <p className="text-3xl sm:text-4xl font-bold">{currentWord}</p>
         </div>
 
@@ -175,8 +177,7 @@ export default function CrocodileGame() {
           <div className="flex items-start gap-2">
             <AlertCircle size={14} className="mt-0.5 text-amber-400 flex-shrink-0" />
             <div>
-              <p>{L('Покажите это жестами — без слов, звуков и указаний на предметы!',
-                    'Act this out with gestures — no words, sounds, or pointing!')}</p>
+              <p>{G('no_sounds')}</p>
             </div>
           </div>
         </div>
@@ -197,7 +198,7 @@ export default function CrocodileGame() {
     return (
       <div className="space-y-6 text-center">
         <p className="text-text-muted text-sm">
-          {players[currentPlayerIndex]?.name} {L('показывает', 'is acting')}
+          {players[currentPlayerIndex]?.name} {G('acting')}
         </p>
 
         <div className="relative w-32 h-32 mx-auto">

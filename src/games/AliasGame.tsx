@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { Plus, Minus, Play, RotateCcw, Users, AlertTriangle } from 'lucide-react'
 import { useI18n } from '../i18n'
+import { useGameText } from '../hooks/useGameText'
 import { useTimer } from '../hooks/useTimer'
 import { aliasWords, aliasWordsEn } from '../data/words'
 import clsx from 'clsx'
@@ -15,6 +16,7 @@ interface Team {
 export default function AliasGame() {
   const { t, lang } = useI18n()
   const L = (ru: string, en: string) => lang === 'ru' ? ru : en
+  const G = useGameText()
 
   const [phase, setPhase] = useState<Phase>('setup')
   const [teams, setTeams] = useState<Team[]>([
@@ -142,7 +144,7 @@ export default function AliasGame() {
         <h2 className="text-2xl font-bold">{L('Алиас', 'Alias')}</h2>
 
         <div className="card p-4 text-sm text-text-secondary space-y-1">
-          <p className="font-medium text-text mb-2">{L('Как играть:', 'How to play:')}</p>
+          <p className="font-medium text-text mb-2">{G('how_to_play')}</p>
           <p>1. {L('Разделитесь на команды', 'Split into teams')}</p>
           <p>2. {L('Один объясняет слово — остальные угадывают', 'One explains — others guess')}</p>
           <p>3. {L('Нельзя: однокоренные слова, жесты, звуки', 'No root words, gestures, or sounds')}</p>
@@ -154,10 +156,7 @@ export default function AliasGame() {
           <div className="card p-3 border-amber-500/30 bg-amber-500/5 flex items-start gap-2 text-sm">
             <AlertTriangle size={18} className="text-amber-400 shrink-0 mt-0.5" />
             <p className="text-amber-300">
-              {L(
-                'Рекомендуется минимум 4 игрока (по 2 в команде). Сейчас: ' + totalPlayers,
-                'At least 4 players recommended (2 per team). Currently: ' + totalPlayers
-              )}
+              {G('min_players_warning')} ({L('по 2 в команде', '2 per team')}). {L('Сейчас', 'Currently')}: {totalPlayers}
             </p>
           </div>
         )}
@@ -186,7 +185,7 @@ export default function AliasGame() {
               {/* Players per team */}
               <div className="flex items-center gap-2 ml-1 text-xs text-text-muted">
                 <Users size={12} />
-                <span>{L('Игроков:', 'Players:')}</span>
+                <span>{G('players_label')}</span>
                 <button onClick={() => updatePlayersPerTeam(i, -1)}
                   className="w-5 h-5 rounded bg-bg-surface flex items-center justify-center hover:bg-border transition-colors">
                   <Minus size={10} />
@@ -202,19 +201,19 @@ export default function AliasGame() {
           {/* Total players */}
           <div className="flex items-center justify-end gap-1.5 text-xs text-text-muted pt-1">
             <Users size={12} />
-            <span>{L('Всего игроков:', 'Total players:')} <span className="font-mono text-text">{totalPlayers}</span></span>
+            <span>{G('total_players')} <span className="font-mono text-text">{totalPlayers}</span></span>
           </div>
         </div>
 
         {/* Recommended settings */}
         <div className="card p-3 bg-accent/5 border-accent/20 space-y-1.5 text-sm">
           <p className="font-medium text-accent text-xs uppercase tracking-wider">
-            {L('Рекомендуемые настройки', 'Recommended settings')}
+            {G('recommended_settings')}
           </p>
           <p className="text-text-secondary">
-            {L('Цель', 'Target')}: <span className="text-text font-mono">{suggestTargetScore(teams.length)}</span> {t.game.points}
+            {G('target')}: <span className="text-text font-mono">{suggestTargetScore(teams.length)}</span> {t.game.points}
             {' · '}
-            {L('Таймер', 'Timer')}: <span className="text-text font-mono">{getRecommendedTimer()}</span> {L('сек', 'sec')}
+            {L('Таймер', 'Timer')}: <span className="text-text font-mono">{getRecommendedTimer()}</span> {G('sec')}
           </p>
           <p className="text-text-muted text-xs">
             {L(
@@ -228,7 +227,7 @@ export default function AliasGame() {
         <div className="card p-4 space-y-4">
           <div>
             <label className="text-sm text-text-secondary block mb-2">
-              {L('Цель', 'Target score')}: <span className="text-text font-mono">{targetScore}</span> {t.game.points}
+              {G('target_score')}: <span className="text-text font-mono">{targetScore}</span> {t.game.points}
             </label>
             <input type="range" min={20} max={100} step={10} value={targetScore}
               onChange={e => setTargetScore(Number(e.target.value))}
@@ -236,7 +235,7 @@ export default function AliasGame() {
           </div>
           <div>
             <label className="text-sm text-text-secondary block mb-2">
-              {L('Время на ход', 'Turn time')}: <span className="text-text font-mono">{timerSeconds}</span> {L('сек', 'sec')}
+              {G('turn_time')}: <span className="text-text font-mono">{timerSeconds}</span> {G('sec')}
             </label>
             <input type="range" min={30} max={120} step={10} value={timerSeconds}
               onChange={e => setTimerSeconds(Number(e.target.value))}
@@ -276,25 +275,22 @@ export default function AliasGame() {
         )}
 
         <div className="card p-8 space-y-4">
-          <p className="text-text-muted text-sm">{L('Ход команды', 'Current turn')}</p>
+          <p className="text-text-muted text-sm">{G('current_turn')}</p>
           <p className="text-3xl font-bold text-accent">{teams[currentTeam].name}</p>
           <p className="text-text-secondary text-sm">
-            {L(
-              'Передайте телефон объясняющему игроку. У вас ' + timerSeconds + ' секунд.',
-              'Pass the phone to the explainer. You have ' + timerSeconds + ' seconds.'
-            )}
+            {G('pass_phone')}. {L('У вас ' + timerSeconds + ' секунд.', 'You have ' + timerSeconds + ' seconds.')}
           </p>
         </div>
 
         <div className="card p-4 text-sm text-text-muted space-y-1">
-          <p>{L('Напоминание:', 'Reminder:')}</p>
-          <p>&bull; {L('Нельзя использовать однокоренные слова', 'No root words allowed')}</p>
-          <p>&bull; {L('Нельзя показывать жестами', 'No gestures allowed')}</p>
-          <p>&bull; {L('Если сложно — лучше пропустить', 'If it\'s hard — better skip')}</p>
+          <p>{G('reminder')}</p>
+          <p>&bull; {G('no_root_words')}</p>
+          <p>&bull; {G('no_gestures')}</p>
+          <p>&bull; {G('better_skip')}</p>
         </div>
 
         <button onClick={startTurn} className="btn-primary w-full text-lg py-4">
-          <Play size={20} /> {L('Старт!', 'Start!')}
+          <Play size={20} /> {G('start_btn')}
         </button>
       </div>
     )
@@ -370,7 +366,7 @@ export default function AliasGame() {
             {turnScore >= 0 ? `+${turnScore}` : turnScore}
           </p>
           <p className="text-text-muted text-sm mt-2">
-            {L('Всего', 'Total')}: {teams[currentTeam].score}/{targetScore}
+            {G('total')}: {teams[currentTeam].score}/{targetScore}
           </p>
         </div>
 
@@ -392,8 +388,8 @@ export default function AliasGame() {
 
         <button onClick={nextTurn} className="btn-primary w-full">
           {teams.some(t => t.score >= targetScore)
-            ? L('Результаты', 'Results')
-            : L('Ход следующей команды', 'Next team\'s turn')}
+            ? G('results')
+            : G('next_teams_turn')}
         </button>
       </div>
     )

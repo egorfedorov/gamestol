@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Play, Eye, Check, X, RotateCcw, UserCog, Smartphone } from 'lucide-react'
 import { useI18n } from '../i18n'
+import { useGameText } from '../hooks/useGameText'
 import { useTimer } from '../hooks/useTimer'
 import { quizQuestions } from '../data/quiz'
 import clsx from 'clsx'
@@ -9,6 +10,7 @@ type Phase = 'setup' | 'question' | 'timer' | 'answer' | 'end'
 
 export default function QuizGame() {
   const { t, lang } = useI18n()
+  const G = useGameText()
   const L = (ru: string, en: string) => lang === 'ru' ? ru : en
 
   const [phase, setPhase] = useState<Phase>('setup')
@@ -68,17 +70,17 @@ export default function QuizGame() {
 
         {/* Mode selection */}
         <div className="space-y-2">
-          <p className="text-sm text-text-secondary">{L('Режим игры:', 'Game mode:')}</p>
+          <p className="text-sm text-text-secondary">{G('game_mode')}</p>
           <button onClick={() => setIsHostMode(false)}
             className={clsx('w-full card p-4 text-left flex items-center gap-3 transition-all',
               !isHostMode ? 'border-accent/30 bg-accent/5' : 'hover:border-border-light')}>
             <Smartphone size={20} className={!isHostMode ? 'text-accent' : 'text-text-muted'} />
             <div>
               <p className={clsx('text-sm font-medium', !isHostMode && 'text-accent')}>
-                {L('Телефон показывает', 'Phone shows questions')}
+                {G('phone_shows')}
               </p>
               <p className="text-xs text-text-muted">
-                {L('Все видят вопрос на экране, обсуждают, и проверяют ответ', 'Everyone sees the question, discusses, and checks the answer')}
+                {G('phone_shows_desc')}
               </p>
             </div>
           </button>
@@ -88,10 +90,10 @@ export default function QuizGame() {
             <UserCog size={20} className={isHostMode ? 'text-accent' : 'text-text-muted'} />
             <div>
               <p className={clsx('text-sm font-medium', isHostMode && 'text-accent')}>
-                {L('Ведущий читает', 'Host reads aloud')}
+                {G('host_reads')}
               </p>
               <p className="text-xs text-text-muted">
-                {L('Ведущий зачитывает вопрос вслух, команда обсуждает', 'Host reads the question aloud, team discusses')}
+                {G('host_reads_desc')}
               </p>
             </div>
           </button>
@@ -99,7 +101,7 @@ export default function QuizGame() {
 
         <div className="card p-4">
           <label className="text-sm text-text-secondary block mb-2">
-            {L('Количество вопросов', 'Number of questions')}: <span className="text-text font-mono">{totalQuestions}</span>
+            {G('num_questions')}: <span className="text-text font-mono">{totalQuestions}</span>
           </label>
           <input type="range" min={5} max={Math.min(30, questions.length)} value={totalQuestions}
             onChange={e => setTotalQuestions(Number(e.target.value))}
@@ -107,10 +109,10 @@ export default function QuizGame() {
         </div>
 
         <div className="card p-4 text-sm text-text-secondary space-y-1">
-          <p className="font-medium text-text mb-2">{L('Правила:', 'Rules:')}</p>
-          <p>{L('60 секунд на обсуждение каждого вопроса', '60 seconds to discuss each question')}</p>
-          <p>{L('Один человек (капитан) даёт финальный ответ', 'One person (captain) gives the final answer')}</p>
-          <p>{L('Нельзя гуглить!', 'No googling!')}</p>
+          <p className="font-medium text-text mb-2">{G('rules')}</p>
+          <p>{G('question_time')}</p>
+          <p>{G('captain_answers')}</p>
+          <p>{G('no_googling')}</p>
         </div>
 
         <button onClick={startGame} className="btn-primary w-full">
@@ -138,12 +140,12 @@ export default function QuizGame() {
           <>
             <div className="card p-6 text-center">
               <p className="text-text-muted text-sm mb-3">
-                {L('Зачитайте вопрос вслух:', 'Read the question aloud:')}
+                {G('read_question_aloud')}
               </p>
               <p className="text-lg leading-relaxed">{q.question}</p>
             </div>
             <p className="text-text-secondary text-xs text-center">
-              {L('Команда не видит экран. Зачитайте и запустите таймер.', 'Team doesn\'t see the screen. Read and start the timer.')}
+              {G('team_no_screen')}
             </p>
           </>
         ) : (
@@ -154,7 +156,7 @@ export default function QuizGame() {
 
         <button onClick={startTimer} className="btn-primary w-full text-lg py-4">
           <Play size={20} />
-          {L('Обсуждение — 60 секунд', 'Discussion — 60 seconds')}
+          {G('start_discussion')}
         </button>
       </div>
     )
@@ -191,7 +193,7 @@ export default function QuizGame() {
         )}
 
         <button onClick={showAnswer} className="btn-secondary w-full">
-          <Eye size={18} /> {L('Показать ответ', 'Show Answer')}
+          <Eye size={18} /> {G('show_answer')}
         </button>
       </div>
     )
@@ -217,7 +219,7 @@ export default function QuizGame() {
         </div>
 
         <p className="text-text-secondary text-sm text-center">
-          {L('Команда ответила правильно?', 'Did the team answer correctly?')}
+          {G('answered_correctly')}
         </p>
 
         <div className="grid grid-cols-2 gap-3">
@@ -225,13 +227,13 @@ export default function QuizGame() {
             className="py-5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-lg font-semibold
               active:scale-95 transition-transform touch-manipulation">
             <X size={24} className="mx-auto mb-1" />
-            {L('Неверно', 'Wrong')}
+            {G('wrong_answer')}
           </button>
           <button onClick={() => nextQuestion(true)}
             className="py-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-lg font-semibold
               active:scale-95 transition-transform touch-manipulation">
             <Check size={24} className="mx-auto mb-1" />
-            {L('Верно', 'Correct')}
+            {G('correct_answer')}
           </button>
         </div>
       </div>
@@ -250,7 +252,7 @@ export default function QuizGame() {
         <div className="card p-8">
           <p className="text-4xl mb-2">{emoji}</p>
           <p className="text-5xl font-bold font-mono text-accent mb-2">{score}/{totalQuestions}</p>
-          <p className="text-text-secondary">{pct}% {L('правильных', 'correct')}</p>
+          <p className="text-text-secondary">{pct}% {G('correct_pct')}</p>
         </div>
         <button onClick={resetGame} className="btn-primary w-full">
           <RotateCcw size={18} /> {t.game.play_again}

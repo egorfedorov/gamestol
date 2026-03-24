@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Moon, Sun, Eye, SkipForward, Vote, Skull, Heart, Shield, Search, UserCog, AlertCircle } from 'lucide-react'
 import { useI18n } from '../i18n'
+import { useGameText } from '../hooks/useGameText'
 import PlayerSetup from '../components/PlayerSetup'
 import { Player } from '../types'
 import clsx from 'clsx'
@@ -24,6 +25,7 @@ const allRoles: Role[] = ['mafia', 'citizen', 'doctor', 'detective']
 
 export default function MafiaGame() {
   const { t, lang } = useI18n()
+  const G = useGameText('mafia')
   const L = (ru: string, en: string) => lang === 'ru' ? ru : en
 
   const [phase, setPhase] = useState<Phase>('setup')
@@ -212,12 +214,12 @@ export default function MafiaGame() {
           <h2 className="text-2xl font-bold">🎭 {L('Мафия', 'Mafia')}</h2>
           <span className="badge text-amber-400 bg-amber-400/10">
             <UserCog size={12} className="mr-1" />
-            {L('Ведущий', 'Host')}
+            {G('host')}
           </span>
         </div>
 
         <div className="card p-4 text-sm text-text-secondary space-y-1">
-          <p className="font-medium text-text mb-2">{L('Как это работает:', 'How it works:')}</p>
+          <p className="font-medium text-text mb-2">{G('how_it_works')}</p>
           <p>{L('1. Вы — ведущий. Добавьте имена всех игроков', '1. You are the host. Add all player names')}</p>
           <p>{L('2. Назначьте каждому роль (мафия, доктор, комиссар, мирный)', '2. Assign roles to each player')}</p>
           <p>{L('3. Управляйте ночными и дневными фазами через телефон', '3. Manage night/day phases from your phone')}</p>
@@ -227,7 +229,7 @@ export default function MafiaGame() {
 
         <button onClick={goToRoles} disabled={players.length < 6}
           className="btn-primary w-full disabled:opacity-40">
-          {L('Назначить роли', 'Assign Roles')}
+          {G('assign_roles')}
         </button>
       </div>
     )
@@ -239,17 +241,17 @@ export default function MafiaGame() {
   if (phase === 'assign_roles') {
     return (
       <div className="space-y-6">
-        <h2 className="text-xl font-bold">{L('Назначение ролей', 'Role Assignment')}</h2>
+        <h2 className="text-xl font-bold">{G('assign_roles')}</h2>
 
         {/* Role limits info */}
         <div className="card p-4 text-sm text-text-secondary">
           <p className="font-medium text-text mb-2">
-            {L(`Правила для ${players.length} игроков:`, `Rules for ${players.length} players:`)}
+            {G('rules_for') + ' ' + players.length + ' ' + G('players_label')}
           </p>
-          <p>• {L('Мафия', 'Mafia')}: {L('максимум', 'max')} <span className="text-red-400 font-mono">{maxMafia}</span></p>
-          <p>• {L('Доктор', 'Doctor')}: {L('максимум', 'max')} <span className="text-emerald-400 font-mono">{maxDoctor}</span></p>
-          <p>• {L('Комиссар', 'Detective')}: {L('максимум', 'max')} <span className="text-amber-400 font-mono">{maxDetective}</span></p>
-          <p>• {L('Мирные', 'Citizens')}: {L('остальные', 'the rest')} <span className="text-blue-400 font-mono">({players.length - maxMafia - maxDoctor - maxDetective}+)</span></p>
+          <p>• {L('Мафия', 'Mafia')}: {G('max')} <span className="text-red-400 font-mono">{maxMafia}</span></p>
+          <p>• {L('Доктор', 'Doctor')}: {G('max')} <span className="text-emerald-400 font-mono">{maxDoctor}</span></p>
+          <p>• {L('Комиссар', 'Detective')}: {G('max')} <span className="text-amber-400 font-mono">{maxDetective}</span></p>
+          <p>• {L('Мирные', 'Citizens')}: {G('the_rest')} <span className="text-blue-400 font-mono">({players.length - maxMafia - maxDoctor - maxDetective}+)</span></p>
         </div>
 
         {/* Role counters with limits */}
@@ -313,16 +315,16 @@ export default function MafiaGame() {
           <div className="flex items-center gap-2 text-amber-400 text-xs">
             <AlertCircle size={14} />
             {mafiaCount === 0
-              ? L('Назначьте хотя бы одного мафиози', 'Assign at least one mafia member')
+              ? G('assign_at_least')
               : mafiaCount > maxMafia
                 ? L(`Максимум ${maxMafia} мафии для ${players.length} игроков`, `Max ${maxMafia} mafia for ${players.length} players`)
-                : L('Назначьте роли всем игрокам', 'Assign roles to all players')}
+                : G('assign_roles_all')}
           </div>
         )}
 
         <button onClick={startGame} disabled={!canStart}
           className="btn-primary w-full disabled:opacity-40">
-          {L('Начать игру — Ночь 1', 'Start Game — Night 1')}
+          {G('start_night')}
         </button>
       </div>
     )
@@ -334,19 +336,19 @@ export default function MafiaGame() {
   if (phase === 'night') {
     const phaseInfo = {
       mafia: {
-        title: L('Мафия просыпается', 'Mafia wakes up'),
+        title: G('mafia_wakes'),
         instruction: L('Скажите: «Город засыпает. Мафия, откройте глаза и выберите жертву.»', 'Say: "The city sleeps. Mafia, open your eyes and choose a victim."'),
-        action: L('Кого убивает мафия?', 'Who does the mafia kill?'),
+        action: G('mafia_choose'),
       },
       doctor: {
-        title: L('Доктор просыпается', 'Doctor wakes up'),
+        title: G('doctor_wakes'),
         instruction: L('Скажите: «Мафия засыпает. Доктор, откройте глаза. Кого вы хотите вылечить?»', 'Say: "Mafia sleeps. Doctor, open your eyes. Who do you want to save?"'),
-        action: L('Кого спасает доктор?', 'Who does the doctor save?'),
+        action: G('doctor_choose'),
       },
       detective: {
-        title: L('Комиссар просыпается', 'Detective wakes up'),
+        title: G('detective_wakes'),
         instruction: L('Скажите: «Доктор засыпает. Комиссар, откройте глаза. Кого вы хотите проверить?»', 'Say: "Doctor sleeps. Detective, open your eyes. Who do you want to check?"'),
-        action: L('Кого проверяет комиссар?', 'Who does the detective check?'),
+        action: G('detective_choose'),
       },
     }
 
@@ -428,27 +430,27 @@ export default function MafiaGame() {
       <div className="space-y-6">
         <div className="game-phase-indicator">
           <Sun size={16} />
-          {L(`Утро — День ${night}`, `Morning — Day ${night}`)}
+          {G('morning') + ' — ' + L(`День ${night}`, `Day ${night}`)}
         </div>
 
         <div className="card p-5 text-center">
-          <p className="text-sm text-text-muted mb-2">{L('Скажите игрокам:', 'Tell the players:')}</p>
+          <p className="text-sm text-text-muted mb-2">{G('tell_players')}</p>
           <p className="text-lg font-medium italic">
-            «{L('Город просыпается.', 'The city wakes up.')} {nightResult}»
+            «{G('city_wakes')} {nightResult}»
           </p>
         </div>
 
         {detectiveResult && (
           <div className="card p-4 border-amber-500/20 bg-amber-500/5">
             <p className="text-xs text-text-muted mb-1">
-              {L('Шепните комиссару:', 'Whisper to the detective:')}
+              {G('whisper_detective')}
             </p>
             <p className="text-sm font-medium text-amber-400">{detectiveResult}</p>
           </div>
         )}
 
         <button onClick={goToDay} className="btn-primary w-full">
-          {L('Начать обсуждение', 'Start Discussion')}
+          {G('start_discussion')}
         </button>
       </div>
     )
@@ -468,13 +470,13 @@ export default function MafiaGame() {
         <div className="card p-4">
           <p className="text-sm text-text-muted mb-2">{L('Скажите:', 'Say:')}</p>
           <p className="text-sm italic">
-            «{L('Кого вы подозреваете? У каждого есть минута на защиту.', 'Who do you suspect? Each player has one minute to defend themselves.')}»
+            «{G('say_discuss')}»
           </p>
         </div>
 
         {/* Alive/dead grid — host sees roles */}
         <div className="card p-4">
-          <p className="text-xs text-text-muted mb-3">{L(`В живых: ${alive.length}`, `Alive: ${alive.length}`)}</p>
+          <p className="text-xs text-text-muted mb-3">{G('alive') + ': ' + alive.length}</p>
           <div className="space-y-1.5">
             {gamePlayers.map(p => {
               const rc = roleConfig[p.role]
@@ -501,7 +503,7 @@ export default function MafiaGame() {
           </button>
           <button onClick={skipVote} className="btn-secondary flex-1">
             <SkipForward size={18} />
-            {L('Пропустить', 'Skip')}
+            {G('skip_vote')}
           </button>
         </div>
       </div>
@@ -522,7 +524,7 @@ export default function MafiaGame() {
         <div className="card p-4">
           <p className="text-sm text-text-muted mb-1">{L('Скажите:', 'Say:')}</p>
           <p className="text-sm italic">
-            «{L('Голосуем. Кого исключаем из города?', 'Time to vote. Who do we eliminate?')}»
+            «{G('say_vote')}»
           </p>
         </div>
 
@@ -565,8 +567,8 @@ export default function MafiaGame() {
         <div className={clsx('card p-8', mafiaWon ? 'border-red-500/30' : 'border-emerald-500/30')}>
           <p className="text-xl font-bold mb-2">
             {mafiaWon
-              ? L('🔪 Мафия победила!', '🔪 Mafia wins!')
-              : L('🎉 Мирные победили!', '🎉 Citizens win!')}
+              ? '🔪 ' + G('mafia_wins')
+              : '🎉 ' + G('citizens_win')}
           </p>
           <p className="text-text-muted text-sm mb-4">
             {L(`Игра длилась ${night} ${night === 1 ? 'ночь' : night < 5 ? 'ночи' : 'ночей'}`,

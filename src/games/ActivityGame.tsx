@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Plus, Play, Check, SkipForward, RotateCcw, Pencil, MessageSquare, User, AlertCircle } from 'lucide-react'
 import { useI18n } from '../i18n'
+import { useGameText } from '../hooks/useGameText'
 import { useTimer } from '../hooks/useTimer'
 import { activityWords } from '../data/words'
 import clsx from 'clsx'
@@ -13,36 +14,37 @@ interface Team {
   score: number
 }
 
-const modeConfig: Record<Mode, { icon: any; label: { ru: string; en: string }; color: string; desc: { ru: string; en: string } }> = {
-  explain: {
-    icon: MessageSquare,
-    label: { ru: 'Объясни', en: 'Explain' },
-    color: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
-    desc: { ru: 'Объясните слово, не используя однокоренные', en: 'Explain the word without using root words' },
-  },
-  draw: {
-    icon: Pencil,
-    label: { ru: 'Нарисуй', en: 'Draw' },
-    color: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
-    desc: { ru: 'Нарисуйте слово — без букв и цифр', en: 'Draw the word — no letters or numbers' },
-  },
-  show: {
-    icon: User,
-    label: { ru: 'Покажи', en: 'Show' },
-    color: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
-    desc: { ru: 'Покажите жестами — без слов и звуков', en: 'Show with gestures — no words or sounds' },
-  },
-}
-
-const suggestedScore = (count: number) => {
-  if (count <= 2) return 30
-  if (count === 3) return 40
-  return 50
-}
-
 export default function ActivityGame() {
   const { t, lang } = useI18n()
   const L = (ru: string, en: string) => lang === 'ru' ? ru : en
+  const G = useGameText('activity')
+
+  const modeConfig: Record<Mode, { icon: any; labelKey: string; color: string; descKey: string }> = {
+    explain: {
+      icon: MessageSquare,
+      labelKey: 'explain_mode',
+      color: 'text-blue-400 bg-blue-400/10 border-blue-400/20',
+      descKey: 'explain_desc',
+    },
+    draw: {
+      icon: Pencil,
+      labelKey: 'draw_mode',
+      color: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20',
+      descKey: 'draw_desc',
+    },
+    show: {
+      icon: User,
+      labelKey: 'show_mode',
+      color: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
+      descKey: 'show_desc',
+    },
+  }
+
+  const suggestedScore = (count: number) => {
+    if (count <= 2) return 30
+    if (count === 3) return 40
+    return 50
+  }
 
   const [phase, setPhase] = useState<Phase>('setup')
   const [teams, setTeams] = useState<Team[]>([
@@ -138,14 +140,14 @@ export default function ActivityGame() {
   if (phase === 'setup') {
     return (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold">{L('Активити', 'Activity')}</h2>
+        <h2 className="text-2xl font-bold">{G('title')}</h2>
 
         <div className="card p-4 text-sm text-text-secondary space-y-1">
-          <p className="font-medium text-text mb-2">{L('Как играть:', 'How to play:')}</p>
-          <p>1. <span className="text-blue-400">{L('Объясни', 'Explain')}</span> — {L('описать слово, не используя однокоренные', 'describe the word without root words')}</p>
-          <p>2. <span className="text-emerald-400">{L('Нарисуй', 'Draw')}</span> — {L('нарисовать слово без букв и цифр', 'draw the word, no letters or numbers')}</p>
-          <p>3. <span className="text-amber-400">{L('Покажи', 'Show')}</span> — {L('показать жестами без слов и звуков', 'act out with gestures, no words or sounds')}</p>
-          <p className="pt-1 text-text-muted">{L('Режим выбирается случайно каждый ход', 'Mode is chosen randomly each turn')}</p>
+          <p className="font-medium text-text mb-2">{G('how_to_play')}</p>
+          <p>1. <span className="text-blue-400">{G('explain_mode')}</span> — {G('explain_no_root')}</p>
+          <p>2. <span className="text-emerald-400">{G('draw_mode')}</span> — {G('draw_no_letters')}</p>
+          <p>3. <span className="text-amber-400">{G('show_mode')}</span> — {G('show_no_words')}</p>
+          <p className="pt-1 text-text-muted">{G('mode_random_each_turn')}</p>
         </div>
 
         {/* Teams */}
@@ -176,7 +178,7 @@ export default function ActivityGame() {
 
         <div className="card p-4">
           <label className="text-sm text-text-secondary block mb-2">
-            {L('Цель', 'Target')}: <span className="text-text font-mono">{targetScore}</span> {t.game.points}
+            {G('target')}: <span className="text-text font-mono">{targetScore}</span> {t.game.points}
           </label>
           <input type="range" min={10} max={50} step={5} value={targetScore}
             onChange={e => setTargetScore(Number(e.target.value))}
@@ -184,13 +186,13 @@ export default function ActivityGame() {
         </div>
 
         <div className="card p-4 text-center">
-          <p className="text-text-muted text-sm mb-1">{L('Ход команды', 'Team turn')}</p>
+          <p className="text-text-muted text-sm mb-1">{G('team_turn')}</p>
           <p className="text-lg font-semibold text-accent">{teams[currentTeam].name}</p>
         </div>
 
         <button onClick={drawCard} className="btn-primary w-full text-lg py-4 touch-manipulation">
           <Play size={20} />
-          {L('Вытянуть карту', 'Draw Card')}
+          {G('draw_card')}
         </button>
       </div>
     )
@@ -217,26 +219,26 @@ export default function ActivityGame() {
 
         <div className={clsx('inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium', mc.color)}>
           <Icon size={16} />
-          {L(mc.label.ru, mc.label.en)}
+          {G(mc.labelKey)}
         </div>
 
         <div className="card p-8 space-y-4">
           <p className="text-text-muted text-sm">
             {t.game.team}: <span className="text-accent font-medium">{teams[currentTeam].name}</span>
           </p>
-          <p className="text-sm text-text-secondary mb-2">{L('Ваше слово:', 'Your word:')}</p>
+          <p className="text-sm text-text-secondary mb-2">{G('your_word')}</p>
           <p className="text-3xl sm:text-4xl font-bold">{currentWord}</p>
         </div>
 
         <div className="card p-4 text-sm text-text-muted space-y-1">
           <div className="flex items-start gap-2">
             <AlertCircle size={14} className="mt-0.5 text-amber-400 flex-shrink-0" />
-            <p>{L(mc.desc.ru, mc.desc.en)}</p>
+            <p>{G(mc.descKey)}</p>
           </div>
         </div>
 
         <button onClick={startPlaying} className="btn-primary w-full text-lg py-5 touch-manipulation">
-          <Play size={20} /> {L('Старт (60 сек)', 'Start (60s)')}
+          <Play size={20} /> {G('start_60s')}
         </button>
       </div>
     )
@@ -255,7 +257,7 @@ export default function ActivityGame() {
         <div className="flex items-center justify-between">
           <div className={clsx('inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-medium', mc.color)}>
             <Icon size={12} />
-            {L(mc.label.ru, mc.label.en)}
+            {G(mc.labelKey)}
           </div>
           <span className="text-sm text-text-muted">+{turnScore}</span>
         </div>

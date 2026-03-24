@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Plus, Play, Check, SkipForward, RotateCcw, Users, Hash, AlertTriangle } from 'lucide-react'
 import { useI18n } from '../i18n'
+import { useGameText } from '../hooks/useGameText'
 import { useTimer } from '../hooks/useTimer'
 import { hatWords } from '../data/words'
 import clsx from 'clsx'
@@ -16,6 +17,7 @@ interface Pair {
 export default function HatGame() {
   const { t, lang } = useI18n()
   const L = (ru: string, en: string) => lang === 'ru' ? ru : en
+  const G = useGameText('hat')
 
   // ═══════════════════════════════════════════
   // STATE
@@ -149,16 +151,16 @@ export default function HatGame() {
   if (phase === 'setup') {
     return (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold">🎩 {L('Шляпа', 'Hat Game')}</h2>
+        <h2 className="text-2xl font-bold">{G('title')}</h2>
 
         {/* How to play */}
         <div className="card p-4 text-sm text-text-secondary space-y-1">
-          <p className="font-medium text-text mb-2">{L('Как играть:', 'How to play:')}</p>
-          <p>1. {L('Добавьте минимум 4 игрока', 'Add at least 4 players')}</p>
-          <p>2. {L('Игроки разбиваются на пары: один объясняет, другой угадывает', 'Players form pairs: one explains, the other guesses')}</p>
-          <p>3. {L('Объясняющий описывает слово — нельзя использовать однокоренные слова и жесты', 'Explainer describes a word — no root words or gestures allowed')}</p>
-          <p>4. {L('За отведённое время нужно угадать как можно больше слов', 'Guess as many words as possible before time runs out')}</p>
-          <p>5. {L('Побеждает пара с наибольшим количеством угаданных слов', 'The pair with the most guessed words wins')}</p>
+          <p className="font-medium text-text mb-2">{G('how_to_play')}</p>
+          <p>1. {G('rule_1')}</p>
+          <p>2. {G('rule_2')}</p>
+          <p>3. {G('rule_3')}</p>
+          <p>4. {G('rule_4')}</p>
+          <p>5. {G('rule_5')}</p>
         </div>
 
         {/* Players */}
@@ -194,10 +196,7 @@ export default function HatGame() {
             <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
               <AlertTriangle size={14} className="text-amber-400 mt-0.5 shrink-0" />
               <p className="text-xs text-amber-400">
-                {L(
-                  'Нечётное число игроков — один игрок будет пропускать один раунд',
-                  'Odd player count — one player will sit out one round'
-                )}
+                {G('odd_players_warning')}
               </p>
             </div>
           )}
@@ -209,7 +208,7 @@ export default function HatGame() {
             <input type="checkbox" checked={usePreset} onChange={e => setUsePreset(e.target.checked)}
               className="accent-accent w-4 h-4" />
             <span className="text-sm">
-              {L('Использовать готовые слова', 'Use preset words')}
+              {G('use_preset_words')}
             </span>
           </label>
           {usePreset && playerNames.length >= 2 && (
@@ -222,24 +221,21 @@ export default function HatGame() {
           )}
           {usePreset && playerNames.length < 2 && (
             <p className="text-xs text-text-muted">
-              {L(
-                'Добавьте игроков, чтобы увидеть рекомендуемое количество слов',
-                'Add players to see the recommended word count'
-              )}
+              {G('add_players_for_count')}
             </p>
           )}
           {!usePreset && (
             <>
               <form onSubmit={e => { e.preventDefault(); addWord() }} className="flex gap-2">
                 <input type="text" value={wordInput} onChange={e => setWordInput(e.target.value)}
-                  placeholder={L('Добавить слово', 'Add word')} className="input flex-1" />
+                  placeholder={G('add_word')} className="input flex-1" />
                 <button type="submit" className="btn-primary px-4"><Plus size={18} /></button>
               </form>
               <p className="text-xs text-text-muted">
-                {L('Слов в шляпе', 'Words in hat')}: {wordPool.length}
+                {G('words_in_hat')}: {wordPool.length}
                 {wordPool.length < 10 && (
                   <span className="text-amber-400 ml-2">
-                    {L(`(нужно минимум 10)`, `(need at least 10)`)}
+                    ({G('need_min_10')})
                   </span>
                 )}
                 {playerNames.length >= 2 && wordPool.length >= 10 && (
@@ -266,7 +262,7 @@ export default function HatGame() {
         {/* Timer setting */}
         <div className="card p-4">
           <label className="text-sm text-text-secondary block mb-2">
-            {L('Время на ход', 'Turn time')}: <span className="text-text font-mono">{turnSeconds}</span> {L('сек', 'sec')}
+            {G('turn_time')}: <span className="text-text font-mono">{turnSeconds}</span> {G('sec')}
           </label>
           <input type="range" min={15} max={60} step={5} value={turnSeconds}
             onChange={e => setTurnSeconds(Number(e.target.value))}
@@ -291,10 +287,10 @@ export default function HatGame() {
         {/* Phase indicator */}
         <div className="flex items-center justify-center gap-3">
           <span className="game-phase-indicator">
-            {L('Подготовка', 'Get Ready')}
+            {G('get_ready')}
           </span>
           <span className="text-sm text-text-muted font-mono">
-            {L('Слов', 'Words')}: {hat.length}
+            {G('words')}: {hat.length}
           </span>
         </div>
 
@@ -314,10 +310,10 @@ export default function HatGame() {
 
         {/* Current pair */}
         <div className="card p-8 space-y-4">
-          <p className="text-text-muted text-sm">{L('Сейчас играют', 'Now playing')}</p>
+          <p className="text-text-muted text-sm">{G('now_playing')}</p>
           <div className="space-y-1">
             <p className="text-2xl font-bold text-accent">{pair.explainer}</p>
-            <p className="text-text-muted text-sm">{L('объясняет для', 'explains to')}</p>
+            <p className="text-text-muted text-sm">{G('explains_to')}</p>
             <p className="text-2xl font-bold">{pair.guesser}</p>
           </div>
           <p className="text-text-secondary text-sm">
@@ -330,15 +326,15 @@ export default function HatGame() {
 
         {/* Rules reminder */}
         <div className="card p-4 text-sm text-text-muted space-y-1">
-          <p>{L('Напоминание:', 'Reminder:')}</p>
-          <p>{L('Нельзя использовать однокоренные слова', 'No root words allowed')}</p>
-          <p>{L('Нельзя показывать жестами', 'No gestures allowed')}</p>
-          <p>{L('Пропуск — слово остаётся в шляпе', 'Skipped words stay in the hat')}</p>
+          <p>{G('reminder')}</p>
+          <p>{G('no_root_words')}</p>
+          <p>{G('no_gestures')}</p>
+          <p>{G('skipped_stay_in_hat')}</p>
         </div>
 
         <button onClick={startTurn}
           className="btn-primary w-full text-lg py-5 touch-manipulation">
-          <Play size={22} /> {L('Старт!', 'Start!')}
+          <Play size={22} /> {G('start_btn')}
         </button>
       </div>
     )
@@ -388,7 +384,7 @@ export default function HatGame() {
 
         {/* Turn counter */}
         <p className="text-text-muted text-sm">
-          {L('Угадано в этом раунде', 'Guessed this turn')}: <span className="font-mono text-accent">{turnGuessed}</span>
+          {G('guessed_this_turn')}: <span className="font-mono text-accent">{turnGuessed}</span>
         </p>
 
         {/* Action buttons — BIG for mobile */}
@@ -425,12 +421,12 @@ export default function HatGame() {
           <p className="text-text-muted text-sm mb-1">{pair.explainer} + {pair.guesser}</p>
           <p className="text-5xl font-bold font-mono text-accent">+{turnGuessed}</p>
           <p className="text-text-muted text-sm mt-2">
-            {L('Всего у пары', 'Pair total')}: {pair.score}
+            {G('pair_total')}: {pair.score}
           </p>
         </div>
 
         <p className="text-text-muted text-sm">
-          {L('Слов в шляпе', 'Words in hat')}: <span className="font-mono">{hat.length}</span>
+          {G('words_in_hat')}: <span className="font-mono">{hat.length}</span>
         </p>
 
         {/* All pairs scoreboard */}
@@ -451,8 +447,8 @@ export default function HatGame() {
         <button onClick={nextTurn}
           className="btn-primary w-full py-4 text-lg touch-manipulation">
           {hat.length === 0
-            ? L('Результаты', 'Results')
-            : L('Ход следующей пары', 'Next pair\'s turn')}
+            ? G('results')
+            : G('next_pair')}
         </button>
       </div>
     )

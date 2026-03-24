@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Shuffle, Eye, Vote, RotateCcw, Skull, Smartphone, Users, Shield } from 'lucide-react'
 import { useI18n } from '../i18n'
+import { useGameText } from '../hooks/useGameText'
 import PlayerSetup from '../components/PlayerSetup'
 import { Player } from '../types'
 import { bunkerData } from '../data/bunker'
@@ -31,6 +32,7 @@ const traitLabels = {
 
 export default function BunkerGame() {
   const { t, lang } = useI18n()
+  const G = useGameText()
   const L = (ru: string, en: string) => lang === 'ru' ? ru : en
 
   const [phase, setPhase] = useState<Phase>('setup')
@@ -128,7 +130,7 @@ export default function BunkerGame() {
         </div>
 
         <div className="card p-4 text-sm text-text-secondary space-y-1">
-          <p className="font-medium text-text mb-2">{L('Как это работает:', 'How it works:')}</p>
+          <p className="font-medium text-text mb-2">{G('how_it_works')}</p>
           <p>{L(
             '1. Добавьте имена всех игроков',
             '1. Add all player names'
@@ -191,7 +193,7 @@ export default function BunkerGame() {
         <button onClick={generateCharacters} disabled={players.length < 4}
           className="btn-primary w-full py-5 text-lg disabled:opacity-40 touch-manipulation">
           <Shuffle size={20} />
-          {L('Сгенерировать персонажей', 'Generate Characters')}
+          {G('generate_chars')}
         </button>
       </div>
     )
@@ -219,10 +221,10 @@ export default function BunkerGame() {
 
         {/* Catastrophe banner */}
         <div className="card p-4 border-red-500/20 bg-red-500/5">
-          <p className="text-xs text-text-muted mb-1">{L('Катастрофа:', 'Catastrophe:')}</p>
+          <p className="text-xs text-text-muted mb-1">{G('catastrophe')}:</p>
           <p className="text-sm font-medium">{catastrophe}</p>
           <p className="text-xs text-text-muted mt-2">
-            {L(`Мест в бункере: ${bunkerSlots}`, `Bunker slots: ${bunkerSlots}`)}
+            {`${G('bunker_fits')}: ${bunkerSlots}`}
           </p>
         </div>
 
@@ -262,7 +264,7 @@ export default function BunkerGame() {
                   <button onClick={() => revealTrait(p.id, traitIndex)}
                     className="btn-ghost text-xs py-2 touch-manipulation">
                     <Eye size={14} />
-                    {L('Раскрыть', 'Reveal')} {labels[traitIndex]}
+                    {G('reveal_trait')} {labels[traitIndex]}
                   </button>
                 )}
 
@@ -301,12 +303,12 @@ export default function BunkerGame() {
       <div className="space-y-6">
         <div className="game-phase-indicator">
           <Users size={16} />
-          {t.game.round} {currentRound + 1} — {L('Обсуждение', 'Discussion')}
+          {t.game.round} {currentRound + 1} — {G('discussion_time')}
         </div>
 
         {/* Catastrophe reminder */}
         <div className="card p-4 border-red-500/20 bg-red-500/5">
-          <p className="text-xs text-text-muted mb-1">{L('Катастрофа:', 'Catastrophe:')}</p>
+          <p className="text-xs text-text-muted mb-1">{G('catastrophe')}:</p>
           <p className="text-sm font-medium">{catastrophe}</p>
           <p className="text-xs text-text-muted mt-2">
             {L(
@@ -345,7 +347,7 @@ export default function BunkerGame() {
         <button onClick={startVoting}
           className="btn-primary w-full py-5 text-lg touch-manipulation">
           <Vote size={20} />
-          {L('Перейти к голосованию', 'Proceed to Voting')}
+          {G('start_voting')}
         </button>
       </div>
     )
@@ -412,16 +414,16 @@ export default function BunkerGame() {
 
     return (
       <div className="space-y-6 text-center">
-        <h2 className="text-3xl font-bold">{L('Выжившие!', 'Survivors!')}</h2>
+        <h2 className="text-3xl font-bold">{G('survivors')}</h2>
 
         <div className="card p-4 border-red-500/20 bg-red-500/5">
-          <p className="text-xs text-text-muted mb-1">{L('Катастрофа:', 'Catastrophe:')}</p>
+          <p className="text-xs text-text-muted mb-1">{G('catastrophe')}:</p>
           <p className="text-sm font-medium">{catastrophe}</p>
         </div>
 
         {/* Survivors */}
         <div className="card p-6 border-emerald-500/20">
-          <p className="text-sm text-text-muted mb-4">{L('В бункер попали:', 'Made it to the bunker:')}</p>
+          <p className="text-sm text-text-muted mb-4">{G('in_bunker')}</p>
           {alive.map(p => (
             <div key={p.id} className="text-left mb-4 pb-4 border-b border-border last:border-0 last:pb-0">
               <p className="font-medium mb-1">{p.name}
@@ -436,7 +438,7 @@ export default function BunkerGame() {
 
         {/* Eliminated */}
         <div className="card p-4">
-          <p className="text-xs text-text-muted mb-2">{L('Не попали:', 'Eliminated:')}</p>
+          <p className="text-xs text-text-muted mb-2">{G('eliminated_list')}</p>
           {eliminated.map(p => (
             <p key={p.id} className="text-sm text-text-muted line-through">{p.name} — {p.profession}</p>
           ))}
