@@ -1,5 +1,7 @@
 import { ComponentType } from 'react'
 
+export type HostMode = 'required' | 'optional' | 'none'
+
 export interface GameInfo {
   id: string
   name: string
@@ -11,6 +13,7 @@ export interface GameInfo {
   maxPlayers: number
   duration: string
   difficulty: 'easy' | 'medium' | 'hard'
+  hostMode: HostMode
   categories: string[]
   howToPlay: string[]
   commonMistakes: string[]

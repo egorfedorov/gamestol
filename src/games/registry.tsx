@@ -22,6 +22,7 @@ export const games: GameInfo[] = [
     maxPlayers: 20,
     duration: '30-60 мин',
     difficulty: 'medium',
+    hostMode: 'required',
     categories: ['party', 'detective'],
     howToPlay: [
       'Каждый игрок получает тайную роль: Мафия, Мирный, Доктор или Комиссар',
@@ -50,6 +51,7 @@ export const games: GameInfo[] = [
     maxPlayers: 20,
     duration: '30-60 мин',
     difficulty: 'easy',
+    hostMode: 'none',
     categories: ['party', 'word'],
     howToPlay: [
       'Разделитесь на команды по 2+ человека',
@@ -78,6 +80,7 @@ export const games: GameInfo[] = [
     maxPlayers: 20,
     duration: '20-40 мин',
     difficulty: 'easy',
+    hostMode: 'none',
     categories: ['party', 'creative'],
     howToPlay: [
       'Один игрок показывает слово жестами',
@@ -105,6 +108,7 @@ export const games: GameInfo[] = [
     maxPlayers: 12,
     duration: '20-30 мин',
     difficulty: 'medium',
+    hostMode: 'none',
     categories: ['party', 'word', 'strategy'],
     howToPlay: [
       'На столе 25 слов (5x5). Каждое принадлежит красной, синей команде, нейтральное или убийца',
@@ -133,6 +137,7 @@ export const games: GameInfo[] = [
     maxPlayers: 8,
     duration: '30-60 мин',
     difficulty: 'hard',
+    hostMode: 'optional',
     categories: ['strategy'],
     howToPlay: [
       'Ведущий зачитывает вопрос',
@@ -160,6 +165,7 @@ export const games: GameInfo[] = [
     maxPlayers: 16,
     duration: '40-90 мин',
     difficulty: 'medium',
+    hostMode: 'none',
     categories: ['party', 'strategy'],
     howToPlay: [
       'Выбирается случайная катастрофа и параметры бункера',
@@ -187,6 +193,7 @@ export const games: GameInfo[] = [
     maxPlayers: 20,
     duration: '30-60 мин',
     difficulty: 'easy',
+    hostMode: 'none',
     categories: ['party', 'word'],
     howToPlay: [
       'Каждый игрок пишет 5-10 слов и кладёт в «шляпу»',
@@ -215,6 +222,7 @@ export const games: GameInfo[] = [
     maxPlayers: 8,
     duration: '30-45 мин',
     difficulty: 'easy',
+    hostMode: 'none',
     categories: ['party', 'creative'],
     howToPlay: [
       'Рассказчик выбирает карту и говорит ассоциацию (слово, фраза, звук)',
@@ -242,6 +250,7 @@ export const games: GameInfo[] = [
     maxPlayers: 16,
     duration: '30-60 мин',
     difficulty: 'easy',
+    hostMode: 'none',
     categories: ['party', 'word', 'creative'],
     howToPlay: [
       'Разделитесь на команды',
@@ -269,6 +278,7 @@ export const games: GameInfo[] = [
     maxPlayers: 20,
     duration: '15-30 мин',
     difficulty: 'medium',
+    hostMode: 'required',
     categories: ['detective'],
     howToPlay: [
       'Ведущий зачитывает загадочную ситуацию',

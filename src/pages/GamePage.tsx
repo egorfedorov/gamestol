@@ -1,14 +1,20 @@
 import { useParams, Link } from 'react-router-dom'
 import { useState } from 'react'
-import { ChevronLeft, Play, BookOpen, AlertTriangle, Users, Clock, ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronLeft, Play, BookOpen, AlertTriangle, Users, Clock, ChevronDown, ChevronUp, UserCog, Smartphone } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useI18n } from '../i18n'
 import { games } from '../games/registry'
 import clsx from 'clsx'
 
+const hostBadge = {
+  required: { ru: 'Нужен ведущий', en: 'Host required', color: 'text-amber-400 bg-amber-400/10', icon: UserCog },
+  optional: { ru: 'Ведущий опционален', en: 'Host optional', color: 'text-blue-400 bg-blue-400/10', icon: UserCog },
+  none: { ru: 'Без ведущего', en: 'No host needed', color: 'text-emerald-400 bg-emerald-400/10', icon: Smartphone },
+}
+
 export default function GamePage() {
   const { id } = useParams()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [playing, setPlaying] = useState(false)
   const [showRules, setShowRules] = useState(false)
   const [showMistakes, setShowMistakes] = useState(false)
@@ -37,6 +43,9 @@ export default function GamePage() {
     )
   }
 
+  const hb = hostBadge[game.hostMode]
+  const HBIcon = hb.icon
+
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 pb-24 md:pb-8">
       <Link to="/catalog" className="btn-ghost text-sm -ml-2 mb-6">
@@ -63,6 +72,10 @@ export default function GamePage() {
           <div className="flex items-center gap-1.5 px-3 py-1.5 bg-bg-surface rounded-lg text-sm text-text-secondary">
             <Clock size={14} />
             {game.duration}
+          </div>
+          <div className={clsx('flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm', hb.color)}>
+            <HBIcon size={14} />
+            {lang === 'ru' ? hb.ru : hb.en}
           </div>
         </div>
 

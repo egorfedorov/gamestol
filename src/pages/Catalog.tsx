@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Users, Clock, Star } from 'lucide-react'
+import { Search, Users, Clock, Star, UserCog, Smartphone } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useI18n } from '../i18n'
 import { games } from '../games/registry'
@@ -83,7 +83,7 @@ export default function Catalog() {
               <p className="text-text-secondary text-sm leading-relaxed flex-1 mb-4">
                 {game.tagline}
               </p>
-              <div className="flex items-center gap-4 text-text-muted text-xs">
+              <div className="flex items-center gap-3 text-text-muted text-xs flex-wrap">
                 <span className="flex items-center gap-1">
                   <Users size={13} />
                   {game.minPlayers}-{game.maxPlayers}
@@ -92,6 +92,18 @@ export default function Catalog() {
                   <Clock size={13} />
                   {game.duration}
                 </span>
+                {game.hostMode === 'required' && (
+                  <span className="flex items-center gap-1 text-amber-400">
+                    <UserCog size={11} />
+                    {lang === 'ru' ? 'Ведущий' : 'Host'}
+                  </span>
+                )}
+                {game.hostMode === 'none' && (
+                  <span className="flex items-center gap-1 text-emerald-400">
+                    <Smartphone size={11} />
+                    {lang === 'ru' ? 'Сами' : 'Self'}
+                  </span>
+                )}
               </div>
             </Link>
           </motion.div>
