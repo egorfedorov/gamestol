@@ -9,6 +9,21 @@ import HatGame from './HatGame'
 import ImaginariumGame from './ImaginariumGame'
 import ActivityGame from './ActivityGame'
 import DanetkiGame from './DanetkiGame'
+import AnagramGame from './AnagramGame'
+import ContactGame from './ContactGame'
+import ReverseCharadesGame from './ReverseCharadesGame'
+import TickTockGame from './TickTockGame'
+import OneNightGame from './OneNightGame'
+import TabooGame from './TabooGame'
+import SpyfallGame from './SpyfallGame'
+import WhoAmIGame from './WhoAmIGame'
+import ScattergoriesGame from './ScattergoriesGame'
+import CitiesGame from './CitiesGame'
+import TruthDareGame from './TruthDareGame'
+import NeverHaveIGame from './NeverHaveIGame'
+import ForfeitsGame from './ForfeitsGame'
+import TwoTruthsGame from './TwoTruthsGame'
+import WordChainGame from './WordChainGame'
 
 interface BilingualGameInfo extends Omit<GameInfo, 'nameAlt' | 'tagline' | 'description' | 'howToPlay' | 'commonMistakes'> {
   tagline: { ru: string; en: string }
@@ -327,6 +342,381 @@ const gamesData: BilingualGameInfo[] = [
       en: ['Asking open questions instead of yes/no — only closed questions', 'Host gives detailed answers — only 3 options', 'Random guessing without analysis — build a chain of reasoning', 'Host checks the answer every time — read it beforehand'],
     },
     component: DanetkiGame,
+  },
+  {
+    id: 'truth-dare',
+    name: 'Правда или Действие',
+    nameEn: 'Truth or Dare',
+    emoji: '🔥',
+    tagline: {
+      ru: 'Правда — ответь честно. Действие — выполни задание',
+      en: 'Truth — answer honestly. Dare — complete the challenge',
+    },
+    description: {
+      ru: 'Классическая игра для компании. Каждый по очереди выбирает: ответить на каверзный вопрос или выполнить забавное задание.',
+      en: 'A classic party game. Each player takes turns choosing: answer a tricky question or complete a fun dare.',
+    },
+    minPlayers: 2, maxPlayers: 20, duration: '15-30 min', difficulty: 'easy', hostMode: 'none',
+    categories: ['party'],
+    howToPlay: {
+      ru: ['Случайный игрок выбирает: Правда или Действие', 'Правда — ответь честно на вопрос', 'Действие — выполни задание', 'Игра идёт по раундам, все играют по очереди'],
+      en: ['Random player chooses: Truth or Dare', 'Truth — answer a question honestly', 'Dare — complete the challenge', 'Game goes in rounds, everyone takes turns'],
+    },
+    commonMistakes: {
+      ru: ['Отказываться отвечать — нужно быть честным', 'Выбирать всегда одно и то же — чередуйте', 'Задания слишком жёсткие — держите баланс', 'Пропускать свою очередь — все участвуют'],
+      en: ['Refusing to answer — you must be honest', 'Always picking the same — alternate', 'Dares too extreme — keep balance', 'Skipping your turn — everyone participates'],
+    },
+    component: TruthDareGame,
+  },
+  {
+    id: 'never-have-i',
+    name: 'Я Никогда Не',
+    nameEn: 'Never Have I Ever',
+    emoji: '🙈',
+    tagline: {
+      ru: 'Я никогда не... а ты?',
+      en: 'Never have I ever... but have you?',
+    },
+    description: {
+      ru: 'Игра-признание. Читается утверждение, и те, кто это делал, теряют очко. Кто дошёл до нуля — выбывает.',
+      en: 'A confession game. A statement is read, and those who have done it lose a point. Reach zero — you are out.',
+    },
+    minPlayers: 2, maxPlayers: 20, duration: '15-30 min', difficulty: 'easy', hostMode: 'none',
+    categories: ['party'],
+    howToPlay: {
+      ru: ['Все начинают с одинаковым количеством очков', 'Читается утверждение "Я никогда не..."', 'Если ты ЭТО ДЕЛАЛ — нажми на своё имя (-1 очко)', 'Кто дошёл до 0 — выбывает', 'Последний оставшийся — победитель'],
+      en: ['Everyone starts with the same number of points', 'A "Never have I ever..." statement is read', 'If you HAVE done it — tap your name (-1 point)', 'Reach 0 points — you are out', 'Last one standing wins'],
+    },
+    commonMistakes: {
+      ru: ['Врать о том, что делал — играйте честно', 'Подглядывать за другими перед нажатием — решайте сами', 'Слишком специфичные утверждения — они должны быть универсальными', 'Обижаться на утверждения — это игра!'],
+      en: ['Lying about what you have done — play honestly', 'Peeking at others before tapping — decide for yourself', 'Too specific statements — keep them universal', 'Getting offended by statements — it is a game!'],
+    },
+    component: NeverHaveIGame,
+  },
+  {
+    id: 'forfeits',
+    name: 'Фанты',
+    nameEn: 'Forfeits',
+    emoji: '🎪',
+    tagline: {
+      ru: 'Выполни задание — получи очко',
+      en: 'Complete the challenge — score a point',
+    },
+    description: {
+      ru: 'Каждый игрок получает случайное задание. Выполняет его, а остальные голосуют — зачёт или нет.',
+      en: 'Each player gets a random challenge. Complete it, and others vote — pass or fail.',
+    },
+    minPlayers: 2, maxPlayers: 20, duration: '20-40 min', difficulty: 'easy', hostMode: 'none',
+    categories: ['party', 'creative'],
+    howToPlay: {
+      ru: ['Случайный игрок получает задание', 'Игрок выполняет задание', 'Остальные голосуют: зачёт или нет', 'Большинство решает — +1 очко за успех', 'Побеждает тот, кто набрал больше очков'],
+      en: ['Random player gets a challenge', 'Player completes the challenge', 'Others vote: pass or fail', 'Majority decides — +1 point for success', 'Player with the most points wins'],
+    },
+    commonMistakes: {
+      ru: ['Отказываться выполнять — можно пропустить, но без очков', 'Голосовать предвзято — будьте объективны', 'Слишком быстро голосовать — дайте игроку закончить', 'Не засекать время для заданий с лимитом'],
+      en: ['Refusing to perform — you can skip, but no points', 'Voting with bias — be objective', 'Voting too quickly — let the player finish', 'Not timing challenges that have a time limit'],
+    },
+    component: ForfeitsGame,
+  },
+  {
+    id: 'two-truths',
+    name: 'Две Правды и Ложь',
+    nameEn: 'Two Truths and a Lie',
+    emoji: '🤥',
+    tagline: {
+      ru: 'Угадай, где ложь среди правды',
+      en: 'Spot the lie among the truths',
+    },
+    description: {
+      ru: 'Игрок называет 3 факта о себе — 2 правды и 1 ложь. Остальные голосуют, какой факт ложный.',
+      en: 'A player states 3 facts about themselves — 2 truths and 1 lie. Others vote on which is the lie.',
+    },
+    minPlayers: 3, maxPlayers: 20, duration: '15-30 min', difficulty: 'easy', hostMode: 'none',
+    categories: ['party'],
+    howToPlay: {
+      ru: ['Игрок называет 3 факта о себе: 2 правды и 1 ложь', 'Остальные голосуют — какой факт ложный', 'Угадавшие получают +1 очко', 'Если никто не угадал — ведущий получает +1', 'Побеждает тот, кто набрал больше очков'],
+      en: ['Player states 3 facts: 2 truths and 1 lie', 'Others vote — which fact is the lie', 'Correct guessers get +1 point', 'If nobody guesses — the presenter gets +1', 'Player with the most points wins'],
+    },
+    commonMistakes: {
+      ru: ['Ложь слишком очевидная — сделайте её правдоподобной', 'Правда слишком невероятная — баланс важен', 'Выдают себя мимикой — покерфейс!', 'Называют факты, которые все уже знают'],
+      en: ['Lie too obvious — make it believable', 'Truth too unbelievable — balance is key', 'Giving it away with expressions — poker face!', 'Stating facts everyone already knows'],
+    },
+    component: TwoTruthsGame,
+  },
+  {
+    id: 'word-chain',
+    name: 'Цепочка Слов',
+    nameEn: 'Word Chain',
+    emoji: '🔗',
+    tagline: {
+      ru: 'Назови слово — или вылетаешь!',
+      en: 'Say a word — or you are out!',
+    },
+    description: {
+      ru: 'Игроки по очереди называют слова (ассоциации или на последнюю букву). Не успел — выбываешь. Последний — победитель.',
+      en: 'Players take turns saying words (associations or last-letter chain). Fail and you are out. Last one standing wins.',
+    },
+    minPlayers: 2, maxPlayers: 20, duration: '10-20 min', difficulty: 'easy', hostMode: 'none',
+    categories: ['party', 'word'],
+    howToPlay: {
+      ru: ['Выберите режим: ассоциации или последняя буква', 'Игроки по очереди называют слова', 'Есть таймер — не успел или ошибся — выбываешь', 'Последний оставшийся — победитель'],
+      en: ['Choose mode: associations or last letter', 'Players take turns saying words', 'Timer runs — fail or run out of time — you are out', 'Last one standing wins'],
+    },
+    commonMistakes: {
+      ru: ['Повторять уже сказанные слова — нельзя', 'Слишком долго думать — таймер не ждёт', 'Спорить о связи слов — группа решает', 'Использовать имена собственные — обычно запрещено'],
+      en: ['Repeating already said words — not allowed', 'Thinking too long — the timer does not wait', 'Arguing about word connections — the group decides', 'Using proper nouns — usually forbidden'],
+    },
+    component: WordChainGame,
+  },
+  {
+    id: 'anagram',
+    name: 'Слова из слова',
+    nameEn: 'Words from Word',
+    emoji: '🔤',
+    tagline: {
+      ru: 'Составь как можно больше слов из одного',
+      en: 'Make as many words as possible from one',
+    },
+    description: {
+      ru: 'Показывается длинное слово — за 2 минуты нужно найти как можно больше слов из его букв. Каждый играет сам за себя.',
+      en: 'A long word is shown — in 2 minutes, find as many words as possible from its letters. Everyone plays for themselves.',
+    },
+    minPlayers: 2, maxPlayers: 12, duration: '15-30 min', difficulty: 'easy', hostMode: 'none',
+    categories: ['word'],
+    howToPlay: {
+      ru: ['Показывается длинное слово', 'За 2 минуты составьте как можно больше слов из его букв', 'Записывайте слова на бумаге', 'После таймера каждый сообщает свой счёт', 'Побеждает тот, кто нашёл больше слов'],
+      en: ['A long word is displayed', 'In 2 minutes, form as many words as possible from its letters', 'Write words on paper', 'After the timer, each player reports their count', 'Whoever found the most words wins'],
+    },
+    commonMistakes: {
+      ru: ['Используют буквы, которых нет в слове', 'Считают однобуквенные слова — обычно не считаются', 'Забывают записать слова — потом не вспомнить', 'Не следят за количеством букв — каждая буква используется столько раз, сколько она есть в слове'],
+      en: ['Using letters not in the word', 'Counting single-letter words — usually not allowed', 'Forgetting to write words down — can\'t remember later', 'Not tracking letter counts — each letter can only be used as many times as it appears'],
+    },
+    component: AnagramGame,
+  },
+  {
+    id: 'contact',
+    name: 'Контакт',
+    nameEn: 'Contact',
+    emoji: '📡',
+    tagline: {
+      ru: 'Угадай слово ведущего через подсказки',
+      en: 'Guess the leader\'s word through clues',
+    },
+    description: {
+      ru: 'Ведущий загадывает слово и говорит первую букву. Остальные дают друг другу подсказки — если двое думают об одном слове, кричат «Контакт!» и ведущий открывает следующую букву.',
+      en: 'The leader thinks of a word and says the first letter. Others give each other clues — if two think of the same word, they shout "Contact!" and the leader reveals the next letter.',
+    },
+    minPlayers: 3, maxPlayers: 12, duration: '15-30 min', difficulty: 'medium', hostMode: 'none',
+    categories: ['party', 'word'],
+    howToPlay: {
+      ru: ['Ведущий загадывает слово и называет первую букву', 'Игроки дают подсказки друг другу', 'Если двое подумали об одном слове — «Контакт!»', 'Ведущий либо угадывает, либо открывает букву', 'Цель — угадать слово ведущего'],
+      en: ['Leader thinks of a word and says the first letter', 'Players give clues to each other', 'If two think of the same word — "Contact!"', 'Leader either guesses or reveals a letter', 'Goal — guess the leader\'s word'],
+    },
+    commonMistakes: {
+      ru: ['Подсказка слишком очевидная — ведущий легко угадает', 'Кричат «Контакт!» без реального совпадения', 'Ведущий слишком долго думает — установите лимит', 'Не считают открытые буквы — теряется прогресс'],
+      en: ['Clue is too obvious — leader guesses easily', 'Shouting "Contact!" without a real match', 'Leader takes too long — set a time limit', 'Not tracking revealed letters — progress is lost'],
+    },
+    component: ContactGame,
+  },
+  {
+    id: 'reverse-charades',
+    name: 'Обратные шарады',
+    nameEn: 'Reverse Charades',
+    emoji: '🔄',
+    tagline: {
+      ru: 'Вся команда показывает — один угадывает',
+      en: 'Whole team acts — one person guesses',
+    },
+    description: {
+      ru: 'Как обычные шарады, но наоборот! Вся команда показывает слово жестами, а ОДИН человек угадывает.',
+      en: 'Like regular charades, but reversed! The whole team acts out the word, and ONE person guesses.',
+    },
+    minPlayers: 4, maxPlayers: 20, duration: '20-40 min', difficulty: 'easy', hostMode: 'none',
+    categories: ['party', 'creative'],
+    howToPlay: {
+      ru: ['Разделитесь на команды', 'Вся команда видит слово, кроме угадывающего', 'Команда показывает слово жестами', 'Один человек угадывает', 'Угадали — следующее слово. Время ограничено!'],
+      en: ['Split into teams', 'Whole team sees the word, except the guesser', 'Team acts out the word together', 'One person guesses', 'Correct — next word. Time is limited!'],
+    },
+    commonMistakes: {
+      ru: ['Угадывающий подглядывает на экран — отвернитесь!', 'Команда издаёт звуки — только жесты', 'Один человек показывает, а не вся команда', 'Не засекают время — без лимита игра затягивается'],
+      en: ['Guesser peeks at the screen — look away!', 'Team makes sounds — gestures only', 'One person acts instead of the whole team', 'Not setting a timer — game drags without a limit'],
+    },
+    component: ReverseCharadesGame,
+  },
+  {
+    id: 'tick-tock',
+    name: 'Тик-Так Бум',
+    nameEn: 'Tick Tock Boom',
+    emoji: '💣',
+    tagline: {
+      ru: 'Скажи слово, пока бомба не взорвалась!',
+      en: 'Say a word before the bomb explodes!',
+    },
+    description: {
+      ru: 'Показывается слог — назовите слово с ним и передайте «бомбу» дальше. Таймер скрыт — бомба взрывается случайно! Кто держит бомбу при взрыве — выбывает.',
+      en: 'A syllable is shown — say a word containing it and pass the "bomb". Timer is hidden — the bomb explodes randomly! Whoever holds it when it blows — is eliminated.',
+    },
+    minPlayers: 2, maxPlayers: 12, duration: '10-20 min', difficulty: 'easy', hostMode: 'none',
+    categories: ['party', 'word'],
+    howToPlay: {
+      ru: ['Показывается слог или буквы', 'Назовите слово, подходящее под критерий', 'Передайте «бомбу» следующему', 'Бомба взрывается случайно (10-60 сек)', 'Кто держит бомбу при взрыве — выбывает'],
+      en: ['A syllable or letters are shown', 'Say a word that fits the criteria', 'Pass the "bomb" to the next player', 'Bomb explodes randomly (10-60 sec)', 'Whoever holds the bomb — is eliminated'],
+    },
+    commonMistakes: {
+      ru: ['Повторяют уже сказанные слова — нельзя', 'Слишком долго думают — бомба не ждёт!', 'Передают бомбу без слова — нужно назвать слово', 'Называют несуществующие слова — не считается'],
+      en: ['Repeating already-said words — not allowed', 'Thinking too long — the bomb won\'t wait!', 'Passing without saying a word — must say one', 'Making up non-existent words — doesn\'t count'],
+    },
+    component: TickTockGame,
+  },
+  {
+    id: 'one-night',
+    name: 'Одна Ночь',
+    nameEn: 'One Night Werewolf',
+    emoji: '🐺',
+    tagline: {
+      ru: 'Одна ночь, одно голосование, одна жизнь',
+      en: 'One night, one vote, one life',
+    },
+    description: {
+      ru: 'Быстрая версия Мафии. Одна ночная фаза: оборотни видят друг друга, провидец проверяет, вор крадёт роль. Затем 5 минут обсуждения и одно голосование.',
+      en: 'A fast Mafia variant. One night phase: werewolves see each other, seer checks, robber steals a role. Then 5-minute discussion and one vote.',
+    },
+    minPlayers: 4, maxPlayers: 8, duration: '10-15 min', difficulty: 'medium', hostMode: 'required',
+    categories: ['party', 'detective'],
+    howToPlay: {
+      ru: ['Каждый получает роль: Оборотень, Провидец, Вор или Мирный', 'ОДНА ночь: оборотни видят друг друга, провидец проверяет, вор крадёт роль', '5 минут обсуждения', 'ОДНО голосование — большинством', 'Если оборотень выбыл — деревня победила'],
+      en: ['Each player gets a role: Werewolf, Seer, Robber, or Villager', 'ONE night: werewolves see each other, seer checks, robber steals a role', '5-minute discussion', 'ONE vote — by majority', 'If a werewolf is eliminated — village wins'],
+    },
+    commonMistakes: {
+      ru: ['Вор забывает, что его роль поменялась', 'Провидец сразу говорит, кого проверил — лучше подождать', 'Оборотни не запомнили друг друга — внимательнее ночью', 'Голосуют без обсуждения — используйте все 5 минут'],
+      en: ['Robber forgets their role changed', 'Seer immediately reveals who they checked — better to wait', 'Werewolves didn\'t remember each other — pay attention at night', 'Voting without discussion — use all 5 minutes'],
+    },
+    component: OneNightGame,
+  },
+  {
+    id: 'taboo',
+    name: 'Табу',
+    nameEn: 'Taboo',
+    emoji: '🚫',
+    tagline: {
+      ru: 'Объясни слово, но не произноси запрещённые!',
+      en: 'Explain the word without saying the forbidden ones!',
+    },
+    description: {
+      ru: 'Командная игра, где нужно объяснить слово, не используя список запрещённых слов. Соперники следят за нарушениями!',
+      en: 'A team game where you explain a word without using a list of forbidden words. Opponents watch for violations!',
+    },
+    minPlayers: 4, maxPlayers: 20, duration: '30-60 min', difficulty: 'easy', hostMode: 'none',
+    categories: ['party', 'word'],
+    howToPlay: {
+      ru: ['Разделитесь на команды', 'Объясняющий видит слово и список запрещённых слов', 'Объясните слово, НЕ используя запрещённые', 'Угадали: +1, нарушение табу: -1, пропуск: 0', 'Побеждает команда, первой набравшая цель'],
+      en: ['Split into teams', 'The explainer sees the word and a list of forbidden words', 'Explain the word WITHOUT using the forbidden ones', 'Correct: +1, taboo violation: -1, skip: 0', 'First team to reach the target score wins'],
+    },
+    commonMistakes: {
+      ru: ['Произносят запрещённое слово случайно — будьте внимательны', 'Используют однокоренные формы запрещённых слов — это тоже нарушение', 'Соперники не следят за нарушениями — они должны быть судьями', 'Слишком долго объясняют одно слово — лучше пропустить'],
+      en: ['Accidentally saying a forbidden word — pay attention', 'Using root forms of forbidden words — that counts as a violation', 'Opponents not monitoring — they should be the judges', 'Spending too long on one word — better to skip'],
+    },
+    component: TabooGame,
+  },
+  {
+    id: 'spyfall',
+    name: 'Находка',
+    nameEn: 'Spyfall',
+    emoji: '🕵️‍♂️',
+    tagline: {
+      ru: 'Найди шпиона среди нас!',
+      en: 'Find the spy among us!',
+    },
+    description: {
+      ru: 'Все игроки знают локацию, кроме одного — шпиона. Задавайте вопросы, чтобы вычислить шпиона, а шпион пытается понять, где все находятся.',
+      en: 'All players know the location except one — the spy. Ask questions to identify the spy, while the spy tries to figure out the location.',
+    },
+    minPlayers: 4, maxPlayers: 8, duration: '10-15 min', difficulty: 'easy', hostMode: 'none',
+    categories: ['party', 'detective'],
+    howToPlay: {
+      ru: ['Каждый получает карточку с локацией, кроме шпиона', 'Игроки задают друг другу вопросы о локации', 'Отвечайте расплывчато — шпион слушает!', 'Голосуйте за шпиона. Если угадали — он может попытаться назвать локацию', 'Шпион побеждает, если остался нераскрытым или угадал локацию'],
+      en: ['Everyone gets a location card except the spy', 'Players ask each other questions about the location', 'Answer vaguely — the spy is listening!', 'Vote for the spy. If found — the spy can try to guess the location', 'Spy wins if undetected or if they guess the location correctly'],
+    },
+    commonMistakes: {
+      ru: ['Слишком прямые вопросы — выдают локацию шпиону', 'Слишком расплывчатые ответы — выглядите как шпион', 'Шпион задаёт общие вопросы — это подозрительно', 'Забывают, что шпион может угадать локацию после голосования'],
+      en: ['Too direct questions — reveal the location to the spy', 'Too vague answers — makes you look like the spy', 'Spy asks generic questions — that is suspicious', 'Forgetting that the spy can guess the location after voting'],
+    },
+    component: SpyfallGame,
+  },
+  {
+    id: 'whoami',
+    name: 'Кто я?',
+    nameEn: 'Who Am I?',
+    emoji: '🤔',
+    tagline: {
+      ru: 'Угадай, кто ты, задавая вопросы!',
+      en: 'Guess who you are by asking questions!',
+    },
+    description: {
+      ru: 'Каждому игроку назначается персонаж, которого видят все, кроме него. Задавайте вопросы «да/нет» и угадайте, кто вы!',
+      en: 'Each player is assigned a character that everyone can see except them. Ask yes/no questions and guess who you are!',
+    },
+    minPlayers: 2, maxPlayers: 10, duration: '15-30 min', difficulty: 'easy', hostMode: 'none',
+    categories: ['party'],
+    howToPlay: {
+      ru: ['Каждому назначается персонаж (только другие видят)', 'На своём ходу задавайте вопросы «да» или «нет»', 'Попытайтесь угадать, кто вы', 'Угадали — вы выиграли! Не угадали — ход переходит дальше'],
+      en: ['Each player gets a character (only others can see it)', 'On your turn, ask yes/no questions', 'Try to guess who you are', 'Guessed correctly — you win! Wrong — turn passes'],
+    },
+    commonMistakes: {
+      ru: ['Задают открытые вопросы вместо «да/нет»', 'Подсказывают игроку напрямую — только да/нет', 'Угадывают слишком рано без достаточно вопросов', 'Показывают экран игроку, которому назначен персонаж'],
+      en: ['Asking open questions instead of yes/no', 'Giving direct hints — only yes/no answers', 'Guessing too early without enough questions', 'Showing the screen to the player who has the character'],
+    },
+    component: WhoAmIGame,
+  },
+  {
+    id: 'scattergories',
+    name: 'Эрудит',
+    nameEn: 'Scattergories',
+    emoji: '📝',
+    tagline: {
+      ru: 'Придумай уникальные слова на букву!',
+      en: 'Think of unique words starting with a letter!',
+    },
+    description: {
+      ru: 'Выпадает случайная буква и категории. Придумайте уникальные слова на эту букву для каждой категории. Совпавшие ответы не считаются!',
+      en: 'A random letter and categories appear. Think of unique words starting with that letter for each category. Duplicate answers don\'t count!',
+    },
+    minPlayers: 2, maxPlayers: 8, duration: '15-30 min', difficulty: 'easy', hostMode: 'none',
+    categories: ['party', 'word'],
+    howToPlay: {
+      ru: ['Появляется случайная буква и 5 категорий', 'За 2 минуты придумайте слова на эту букву', 'Зачитайте ответы — одинаковые вычёркиваются', 'Уникальный ответ = 1 очко', 'Побеждает набравший больше очков за все раунды'],
+      en: ['A random letter and 5 categories appear', 'In 2 minutes, think of words starting with that letter', 'Read answers aloud — duplicates are crossed out', 'Unique answer = 1 point', 'Highest total score across all rounds wins'],
+    },
+    commonMistakes: {
+      ru: ['Пишут слова не на заданную букву — не считается', 'Не вычёркивают одинаковые ответы — это ключевое правило', 'Пишут слишком общие слова — высок шанс совпадения', 'Подглядывают ответы соседа — играйте честно'],
+      en: ['Writing words that don\'t start with the letter — doesn\'t count', 'Not crossing out duplicate answers — this is a key rule', 'Writing too common words — high chance of duplicates', 'Peeking at neighbors\' answers — play fair'],
+    },
+    component: ScattergoriesGame,
+  },
+  {
+    id: 'cities',
+    name: 'Города',
+    nameEn: 'Cities',
+    emoji: '🏙️',
+    tagline: {
+      ru: 'Назови город на последнюю букву!',
+      en: 'Name a city starting with the last letter!',
+    },
+    description: {
+      ru: 'Классическая игра в города. Называйте город на последнюю букву предыдущего. Не успел — выбываешь!',
+      en: 'A classic last-letter city game. Name a city starting with the last letter of the previous one. Too slow — you\'re out!',
+    },
+    minPlayers: 2, maxPlayers: 10, duration: '10-20 min', difficulty: 'easy', hostMode: 'none',
+    categories: ['party', 'word'],
+    howToPlay: {
+      ru: ['Первый игрок называет любой город', 'Следующий называет город на последнюю букву', 'Нельзя повторять города', 'Не успел за отведённое время — выбываешь', 'Последний оставшийся побеждает'],
+      en: ['First player names any city', 'Next player names a city starting with the last letter', 'No repeating cities', 'Run out of time — you\'re eliminated', 'Last player standing wins'],
+    },
+    commonMistakes: {
+      ru: ['Называют не города, а страны — только города', 'Повторяют город, который уже был — запрещено', 'Путают последнюю букву — будьте внимательны с ь/ъ/ы', 'Затягивают время — для этого есть таймер'],
+      en: ['Naming countries instead of cities — cities only', 'Repeating a city that was already said — forbidden', 'Getting the last letter wrong — pay attention', 'Taking too long — that is what the timer is for'],
+    },
+    component: CitiesGame,
   },
 ]
 
