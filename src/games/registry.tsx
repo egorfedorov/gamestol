@@ -10,34 +10,65 @@ import ImaginariumGame from './ImaginariumGame'
 import ActivityGame from './ActivityGame'
 import DanetkiGame from './DanetkiGame'
 
-export const games: GameInfo[] = [
+interface BilingualGameInfo extends Omit<GameInfo, 'tagline' | 'description' | 'howToPlay' | 'commonMistakes'> {
+  tagline: { ru: string; en: string }
+  description: { ru: string; en: string }
+  howToPlay: { ru: string[]; en: string[] }
+  commonMistakes: { ru: string[]; en: string[] }
+}
+
+const gamesData: BilingualGameInfo[] = [
   {
     id: 'mafia',
     name: 'Мафия',
     nameEn: 'Mafia',
     emoji: '🎭',
-    tagline: 'Город засыпает... Просыпается мафия',
-    description: 'Классическая игра на блеф и дедукцию. Мирные жители пытаются вычислить мафию, а мафия — остаться незамеченной. Ведущий управляет фазами дня и ночи.',
+    tagline: {
+      ru: 'Город засыпает... Просыпается мафия',
+      en: 'The city sleeps... The mafia awakens',
+    },
+    description: {
+      ru: 'Классическая игра на блеф и дедукцию. Мирные жители пытаются вычислить мафию, а мафия — остаться незамеченной. Ведущий управляет фазами дня и ночи.',
+      en: 'A classic game of bluffing and deduction. Citizens try to identify the mafia, while the mafia tries to stay hidden. The host manages night and day phases.',
+    },
     minPlayers: 6,
     maxPlayers: 20,
-    duration: '30-60 мин',
+    duration: '30-60 min',
     difficulty: 'medium',
     hostMode: 'required',
     categories: ['party', 'detective'],
-    howToPlay: [
-      'Каждый игрок получает тайную роль: Мафия, Мирный, Доктор или Комиссар',
-      'Ночью мафия выбирает жертву, доктор лечит, комиссар проверяет',
-      'Днём все обсуждают, кто может быть мафией',
-      'Голосование — большинством голосов исключают подозреваемого',
-      'Побеждают мирные, если вся мафия раскрыта, или мафия, если их столько же, сколько мирных',
-    ],
-    commonMistakes: [
-      'Мафия открывает глаза не одновременно — ведущий должен контролировать',
-      'Комиссар может проверить одного и того же человека дважды — это легально, но бессмысленно',
-      'Доктор не может лечить себя два раза подряд (в классических правилах)',
-      'При равном голосовании никого не исключают, а не оба',
-      'Мёртвые игроки НЕ могут говорить и влиять на игру',
-    ],
+    howToPlay: {
+      ru: [
+        'Каждый игрок получает тайную роль: Мафия, Мирный, Доктор или Комиссар',
+        'Ночью мафия выбирает жертву, доктор лечит, комиссар проверяет',
+        'Днём все обсуждают, кто может быть мафией',
+        'Голосование — большинством голосов исключают подозреваемого',
+        'Побеждают мирные, если вся мафия раскрыта, или мафия, если их столько же, сколько мирных',
+      ],
+      en: [
+        'Each player receives a secret role: Mafia, Citizen, Doctor, or Detective',
+        'At night, mafia picks a victim, doctor heals, detective investigates',
+        'During the day, everyone discusses who might be mafia',
+        'Vote to eliminate a suspect by majority',
+        'Citizens win if all mafia are found; mafia wins if they equal the citizens',
+      ],
+    },
+    commonMistakes: {
+      ru: [
+        'Мафия открывает глаза не одновременно — ведущий должен контролировать',
+        'Комиссар может проверить одного и того же человека дважды — бессмысленно',
+        'Доктор не может лечить себя два раза подряд (в классических правилах)',
+        'При равном голосовании никого не исключают, а не обоих',
+        'Мёртвые игроки НЕ могут говорить и влиять на игру',
+      ],
+      en: [
+        'Mafia members open eyes at different times — the host must control this',
+        'Detective can check the same person twice — legal but pointless',
+        'Doctor cannot heal themselves two nights in a row (classic rules)',
+        'On a tied vote, no one is eliminated — not both',
+        'Dead players CANNOT speak or influence the game',
+      ],
+    },
     component: MafiaGame,
   },
   {
@@ -45,56 +76,81 @@ export const games: GameInfo[] = [
     name: 'Алиас',
     nameEn: 'Alias',
     emoji: '💬',
-    tagline: 'Объясни слово, не называя его',
-    description: 'Командная игра, где нужно объяснять слова партнёрам по команде за ограниченное время. Нельзя использовать однокоренные слова.',
+    tagline: {
+      ru: 'Объясни слово, не называя его',
+      en: 'Explain the word without saying it',
+    },
+    description: {
+      ru: 'Командная игра, где нужно объяснять слова партнёрам по команде за ограниченное время. Нельзя использовать однокоренные слова.',
+      en: 'A team game where you explain words to teammates within a time limit. No root words allowed.',
+    },
     minPlayers: 4,
     maxPlayers: 20,
-    duration: '30-60 мин',
+    duration: '30-60 min',
     difficulty: 'easy',
     hostMode: 'none',
     categories: ['party', 'word'],
-    howToPlay: [
-      'Разделитесь на команды по 2+ человека',
-      'Один игрок объясняет слово, остальные в команде угадывают',
-      'За 60 секунд нужно угадать как можно больше слов',
-      'За правильный ответ +1, за пропуск -1',
-      'Нельзя использовать однокоренные слова, жесты и звуки',
-      'Побеждает команда, набравшая больше очков',
-    ],
-    commonMistakes: [
-      'Использование однокоренных слов — «дерево» нельзя объяснить как «деревянный»',
-      'Показывание жестами — в Alias можно только говорить',
-      'Объясняющий называет слово вслух при пропуске — другие команды могут запомнить',
-      'Слишком долго объясняют одно слово — лучше пропустить и взять новое',
-    ],
+    howToPlay: {
+      ru: [
+        'Разделитесь на команды по 2+ человека',
+        'Один игрок объясняет слово, остальные в команде угадывают',
+        'За 60 секунд нужно угадать как можно больше слов',
+        'За правильный ответ +1, за пропуск -1',
+        'Нельзя использовать однокоренные слова, жесты и звуки',
+        'Побеждает команда, набравшая больше очков',
+      ],
+      en: [
+        'Split into teams of 2+ players',
+        'One player explains the word, teammates guess',
+        'Guess as many words as possible in 60 seconds',
+        'Correct answer: +1 point. Skip: -1 point',
+        'No root words, gestures, or sounds allowed',
+        'The team with the most points wins',
+      ],
+    },
+    commonMistakes: {
+      ru: [
+        'Использование однокоренных слов — «дерево» нельзя объяснить как «деревянный»',
+        'Показывание жестами — в Alias можно только говорить',
+        'Объясняющий называет слово вслух при пропуске — другие команды могут запомнить',
+        'Слишком долго объясняют одно слово — лучше пропустить и взять новое',
+      ],
+      en: [
+        'Using root words — you can\'t explain "tree" by saying "wooden"',
+        'Using gestures — in Alias you can only speak',
+        'Saying the word aloud when skipping — other teams might remember it',
+        'Spending too long on one word — better to skip and grab a new one',
+      ],
+    },
     component: AliasGame,
   },
   {
     id: 'crocodile',
     name: 'Крокодил',
-    nameEn: 'Crocodile / Charades',
+    nameEn: 'Charades',
     emoji: '🐊',
-    tagline: 'Покажи слово без слов',
-    description: 'Игра-пантомима, где нужно показать слово жестами, без слов и звуков. Остальные угадывают.',
+    tagline: {
+      ru: 'Покажи слово без слов',
+      en: 'Act it out — no words allowed',
+    },
+    description: {
+      ru: 'Игра-пантомима, где нужно показать слово жестами, без слов и звуков. Остальные угадывают.',
+      en: 'A pantomime game where you act out words using gestures only — no speaking or sounds. Others guess.',
+    },
     minPlayers: 3,
     maxPlayers: 20,
-    duration: '20-40 мин',
+    duration: '20-40 min',
     difficulty: 'easy',
     hostMode: 'none',
     categories: ['party', 'creative'],
-    howToPlay: [
-      'Один игрок показывает слово жестами',
-      'Нельзя говорить, издавать звуки и показывать на предметы',
-      'Остальные пытаются угадать за отведённое время',
-      'Кто угадал — получает очко и становится следующим показывающим',
-      'Можно играть командами или каждый за себя',
-    ],
-    commonMistakes: [
-      'Показывающий издаёт звуки или шевелит губами — это запрещено',
-      'Показывают на реальные предметы в комнате — нельзя',
-      'Используют буквы и цифры жестами — в классических правилах запрещено',
-      'Не засекают время — без лимита игра затягивается',
-    ],
+    howToPlay: {
+      ru: ['Один игрок показывает слово жестами', 'Нельзя говорить, издавать звуки и показывать на предметы', 'Остальные пытаются угадать за отведённое время', 'Кто угадал — получает очко и становится следующим', 'Можно играть командами или каждый за себя'],
+      en: ['One player acts out a word using gestures', 'No speaking, sounds, or pointing at objects', 'Others try to guess within the time limit', 'Whoever guesses correctly scores a point and goes next', 'Play in teams or free-for-all'],
+    },
+    commonMistakes: {
+      ru: ['Показывающий издаёт звуки или шевелит губами — запрещено', 'Показывают на реальные предметы в комнате — нельзя', 'Используют буквы и цифры жестами — запрещено', 'Не засекают время — без лимита игра затягивается'],
+      en: ['The actor makes sounds or moves their lips — forbidden', 'Pointing at real objects in the room — not allowed', 'Using letters or numbers with gestures — forbidden', 'Not setting a timer — without a limit the game drags on'],
+    },
     component: CrocodileGame,
   },
   {
@@ -102,56 +158,49 @@ export const games: GameInfo[] = [
     name: 'Кодовые имена',
     nameEn: 'Codenames',
     emoji: '🕵️',
-    tagline: 'Дай подсказку — одно слово, одно число',
-    description: 'Две команды соревнуются, кто быстрее угадает все свои слова на поле 5x5. Капитан даёт подсказки, а агенты выбирают слова.',
-    minPlayers: 4,
-    maxPlayers: 12,
-    duration: '20-30 мин',
-    difficulty: 'medium',
-    hostMode: 'none',
+    tagline: {
+      ru: 'Дай подсказку — одно слово, одно число',
+      en: 'Give a clue — one word, one number',
+    },
+    description: {
+      ru: 'Две команды соревнуются, кто быстрее угадает все свои слова на поле 5×5. Капитан даёт подсказки, а агенты выбирают слова.',
+      en: 'Two teams compete to find all their words on a 5×5 grid. The spymaster gives clues, agents guess.',
+    },
+    minPlayers: 4, maxPlayers: 12, duration: '20-30 min', difficulty: 'medium', hostMode: 'none',
     categories: ['party', 'word', 'strategy'],
-    howToPlay: [
-      'На столе 25 слов (5x5). Каждое принадлежит красной, синей команде, нейтральное или убийца',
-      'Только капитаны видят, какие слова каким цветом',
-      'Капитан даёт подсказку: одно слово + число (сколько слов связано)',
-      'Команда обсуждает и выбирает слова. Если угадали — продолжают',
-      'Если выбрали слово соперника — ход переходит. Если убийцу — мгновенный проигрыш',
-    ],
-    commonMistakes: [
-      'Капитан даёт подсказку из нескольких слов — можно только ОДНО слово',
-      'Подсказка совпадает с одним из слов на поле — это запрещено',
-      'Капитан реагирует мимикой на выбор команды — покерфейс обязателен',
-      'Команда не обсуждает, а один человек выбирает — обсуждение важно',
-      'Забывают, что убийца = мгновенный проигрыш, а не просто штраф',
-    ],
+    howToPlay: {
+      ru: ['На столе 25 слов (5×5). Каждое принадлежит красной/синей команде, нейтральное или убийца', 'Только капитаны видят цвета слов', 'Капитан даёт подсказку: одно слово + число связанных слов', 'Команда обсуждает и выбирает. Угадали — продолжают', 'Выбрали слово соперника — ход переходит. Убийца — мгновенный проигрыш'],
+      en: ['25 words on a 5×5 grid. Each belongs to red/blue team, neutral, or assassin', 'Only spymasters see the color map', 'Spymaster gives a clue: one word + number of related words', 'Team discusses and guesses. Correct — keep going', 'Wrong team\'s word — turn ends. Assassin — instant loss'],
+    },
+    commonMistakes: {
+      ru: ['Капитан даёт подсказку из нескольких слов — можно только ОДНО', 'Подсказка совпадает со словом на поле — запрещено', 'Капитан реагирует мимикой — покерфейс обязателен', 'Один человек выбирает без обсуждения — обсуждение важно', 'Забывают, что убийца = мгновенный проигрыш'],
+      en: ['Spymaster gives multi-word clues — only ONE word allowed', 'Clue matches a word on the board — forbidden', 'Spymaster reacts with expressions — poker face required', 'One person picks without discussion — teamwork is key', 'Forgetting the assassin = instant loss, not just a penalty'],
+    },
     component: CodenamesGame,
   },
   {
     id: 'quiz',
     name: 'Что? Где? Когда?',
-    nameEn: 'What? Where? When?',
+    nameEn: 'Quiz Battle',
     emoji: '🧠',
-    tagline: 'Минута на обсуждение — отвечайте!',
-    description: 'Интеллектуальная игра, где команда обсуждает вопрос за 60 секунд и даёт ответ. Классика телевизионных игр.',
-    minPlayers: 2,
-    maxPlayers: 8,
-    duration: '30-60 мин',
-    difficulty: 'hard',
-    hostMode: 'optional',
+    tagline: {
+      ru: 'Минута на обсуждение — отвечайте!',
+      en: 'One minute to discuss — answer!',
+    },
+    description: {
+      ru: 'Интеллектуальная игра, где команда обсуждает вопрос за 60 секунд и даёт ответ.',
+      en: 'A trivia game where the team discusses each question for 60 seconds and gives an answer.',
+    },
+    minPlayers: 2, maxPlayers: 8, duration: '30-60 min', difficulty: 'hard', hostMode: 'optional',
     categories: ['strategy'],
-    howToPlay: [
-      'Ведущий зачитывает вопрос',
-      'У команды есть 60 секунд на обсуждение',
-      'Капитан команды даёт финальный ответ',
-      'За правильный ответ команда получает очко',
-      'Играют до определённого количества вопросов или очков',
-    ],
-    commonMistakes: [
-      'Обсуждение после того, как время вышло — ответ нужно давать вовремя',
-      'Капитан не назначен — без него финальное решение затягивается',
-      'Все говорят одновременно — нужно слушать друг друга',
-      'Гуглят ответы — это убивает весь смысл игры',
-    ],
+    howToPlay: {
+      ru: ['Ведущий зачитывает вопрос', 'У команды 60 секунд на обсуждение', 'Капитан даёт финальный ответ', 'За правильный ответ — очко', 'Играют до определённого количества вопросов'],
+      en: ['The host reads a question', 'The team has 60 seconds to discuss', 'The captain gives the final answer', 'Correct answer earns a point', 'Play until a set number of questions'],
+    },
+    commonMistakes: {
+      ru: ['Обсуждение после окончания времени — ответ нужно давать вовремя', 'Капитан не назначен — без него решение затягивается', 'Все говорят одновременно — слушайте друг друга', 'Гуглят ответы — убивает смысл игры'],
+      en: ['Discussing after time runs out — answer must be given on time', 'No captain assigned — decisions drag without one', 'Everyone talks at once — listen to each other', 'Googling answers — defeats the purpose of the game'],
+    },
     component: QuizGame,
   },
   {
@@ -159,27 +208,24 @@ export const games: GameInfo[] = [
     name: 'Бункер',
     nameEn: 'Bunker',
     emoji: '🏚️',
-    tagline: 'Кто достоин выжить?',
-    description: 'Мир уничтожен катастрофой. Есть бункер на ограниченное число мест. Каждый игрок раскрывает свои характеристики и убеждает остальных, почему именно он должен попасть в бункер.',
-    minPlayers: 4,
-    maxPlayers: 16,
-    duration: '40-90 мин',
-    difficulty: 'medium',
-    hostMode: 'none',
+    tagline: {
+      ru: 'Кто достоин выжить?',
+      en: 'Who deserves to survive?',
+    },
+    description: {
+      ru: 'Мир уничтожен катастрофой. Есть бункер на ограниченное число мест. Раскрывайте характеристики и убеждайте, почему именно вы должны выжить.',
+      en: 'The world is destroyed by a catastrophe. There\'s a bunker with limited spots. Reveal your traits and convince others why you deserve to survive.',
+    },
+    minPlayers: 4, maxPlayers: 16, duration: '40-90 min', difficulty: 'medium', hostMode: 'none',
     categories: ['party', 'strategy'],
-    howToPlay: [
-      'Выбирается случайная катастрофа и параметры бункера',
-      'Каждый получает карту персонажа: профессия, здоровье, хобби, фобия, багаж, спецнавык',
-      'В каждом раунде игроки раскрывают одну характеристику',
-      'После раскрытия — обсуждение и голосование за исключение',
-      'Игра продолжается, пока не останется нужное число выживших',
-    ],
-    commonMistakes: [
-      'Раскрывают все характеристики сразу — нужно по одной за раунд',
-      'Голосуют за себя — обычно это запрещено',
-      'Врут о своих характеристиках — карточки нельзя менять',
-      'Обсуждение слишком короткое — дайте каждому защитить себя',
-    ],
+    howToPlay: {
+      ru: ['Выбирается случайная катастрофа и параметры бункера', 'Каждый получает карту: профессия, здоровье, хобби, фобия, багаж, спецнавык', 'В каждом раунде раскрывают одну характеристику', 'После раскрытия — обсуждение и голосование за исключение', 'Продолжается, пока не останется нужное число выживших'],
+      en: ['A random catastrophe and bunker parameters are chosen', 'Each player gets a card: profession, health, hobby, phobia, luggage, special skill', 'Each round, players reveal one trait', 'After revealing — discuss and vote to eliminate someone', 'Continue until the right number of survivors remain'],
+    },
+    commonMistakes: {
+      ru: ['Раскрывают все характеристики сразу — по одной за раунд', 'Голосуют за себя — запрещено', 'Врут о характеристиках — карточки нельзя менять', 'Обсуждение слишком короткое — дайте каждому защиту'],
+      en: ['Revealing all traits at once — one per round only', 'Voting for yourself — not allowed', 'Lying about traits — cards cannot be changed', 'Discussion too short — give everyone a chance to defend'],
+    },
     component: BunkerGame,
   },
   {
@@ -187,28 +233,24 @@ export const games: GameInfo[] = [
     name: 'Шляпа',
     nameEn: 'Hat Game',
     emoji: '🎩',
-    tagline: 'Объясни, покажи, скажи одним словом',
-    description: 'Каждый кидает слова в шляпу. Затем в парах один объясняет, другой угадывает за 30 секунд. Классика домашних вечеринок.',
-    minPlayers: 4,
-    maxPlayers: 20,
-    duration: '30-60 мин',
-    difficulty: 'easy',
-    hostMode: 'none',
+    tagline: {
+      ru: 'Объясни, покажи, скажи одним словом',
+      en: 'Explain it, act it, say it in one word',
+    },
+    description: {
+      ru: 'Каждый кидает слова в шляпу. Затем в парах один объясняет, другой угадывает за 30 секунд.',
+      en: 'Everyone puts words into the hat. Then in pairs, one explains and the other guesses in 30 seconds.',
+    },
+    minPlayers: 4, maxPlayers: 20, duration: '30-60 min', difficulty: 'easy', hostMode: 'none',
     categories: ['party', 'word'],
-    howToPlay: [
-      'Каждый игрок пишет 5-10 слов и кладёт в «шляпу»',
-      'Игроки делятся на пары (или по кругу)',
-      'Один объясняет слова из шляпы, другой угадывает',
-      'На каждую пару — 30 секунд',
-      'За каждое угаданное слово пара получает очко',
-      'Игра идёт, пока шляпа не опустеет',
-    ],
-    commonMistakes: [
-      'Кладут слишком сложные или непонятные слова — все должны их знать',
-      'Не перемешивают слова в шляпе — нужно хорошо перемешать',
-      'Подглядывают слова заранее — это нечестно',
-      'Объясняющий использует однокоренные слова — это запрещено',
-    ],
+    howToPlay: {
+      ru: ['Каждый пишет 5-10 слов и кладёт в «шляпу»', 'Игроки делятся на пары', 'Один объясняет слова, другой угадывает', 'На пару — 30 секунд', 'За угаданное слово — очко', 'Игра до пустой шляпы'],
+      en: ['Each player writes 5-10 words and puts them in the "hat"', 'Players pair up', 'One explains words, the other guesses', '30 seconds per pair', 'Each guessed word = 1 point', 'Game ends when the hat is empty'],
+    },
+    commonMistakes: {
+      ru: ['Кладут непонятные слова — все должны их знать', 'Не перемешивают слова', 'Подглядывают заранее', 'Используют однокоренные слова — запрещено'],
+      en: ['Adding obscure words — everyone should know them', 'Not shuffling the words', 'Peeking at words in advance', 'Using root words — forbidden'],
+    },
     component: HatGame,
   },
   {
@@ -216,27 +258,24 @@ export const games: GameInfo[] = [
     name: 'Имаджинариум',
     nameEn: 'Imaginarium / Dixit',
     emoji: '🎨',
-    tagline: 'Угадай ассоциацию художника',
-    description: 'Игра на ассоциации. Рассказчик загадывает ассоциацию к своей карте. Остальные подкладывают похожие карты. Все голосуют за карту рассказчика.',
-    minPlayers: 3,
-    maxPlayers: 8,
-    duration: '30-45 мин',
-    difficulty: 'easy',
-    hostMode: 'none',
+    tagline: {
+      ru: 'Угадай ассоциацию художника',
+      en: 'Guess the storyteller\'s association',
+    },
+    description: {
+      ru: 'Игра на ассоциации. Рассказчик загадывает ассоциацию, остальные подкладывают похожие карты. Все голосуют.',
+      en: 'An association game. The storyteller gives a clue for their card. Others play similar cards. Everyone votes.',
+    },
+    minPlayers: 3, maxPlayers: 8, duration: '30-45 min', difficulty: 'easy', hostMode: 'none',
     categories: ['party', 'creative'],
-    howToPlay: [
-      'Рассказчик выбирает карту и говорит ассоциацию (слово, фраза, звук)',
-      'Остальные подкладывают свою карту, подходящую под ассоциацию',
-      'Все карты перемешиваются и выкладываются',
-      'Все (кроме рассказчика) голосуют за карту, которая, по их мнению, принадлежит рассказчику',
-      'Начисление очков: если все/никто не угадал — рассказчик не получает очков',
-    ],
-    commonMistakes: [
-      'Ассоциация слишком очевидная — все угадают и рассказчик не получит очков',
-      'Ассоциация слишком абстрактная — никто не угадает, тот же результат',
-      'Забывают, что нужен баланс — ассоциация должна быть понятна не всем, но хотя бы кому-то',
-      'Голосуют за свою карту — это запрещено',
-    ],
+    howToPlay: {
+      ru: ['Рассказчик говорит ассоциацию к своей карте', 'Остальные подкладывают подходящую карту', 'Карты перемешиваются и выкладываются', 'Все голосуют за карту рассказчика', 'Если все/никто не угадал — рассказчик получает 0 очков'],
+      en: ['Storyteller gives an association for their card', 'Others play a matching card from their hand', 'All cards are shuffled and revealed', 'Everyone votes for the storyteller\'s card', 'If everyone/no one guesses right — storyteller gets 0 points'],
+    },
+    commonMistakes: {
+      ru: ['Слишком очевидная ассоциация — все угадают, 0 очков', 'Слишком абстрактная — никто не угадает, 0 очков', 'Нужен баланс — понятно не всем, но кому-то', 'Голосуют за свою карту — запрещено'],
+      en: ['Too obvious association — everyone guesses, 0 points', 'Too abstract — no one guesses, same result', 'Need balance — clear to some but not all', 'Voting for your own card — forbidden'],
+    },
     component: ImaginariumGame,
   },
   {
@@ -244,27 +283,24 @@ export const games: GameInfo[] = [
     name: 'Активити',
     nameEn: 'Activity',
     emoji: '🎯',
-    tagline: 'Объясни, нарисуй или покажи',
-    description: 'Командная игра, где нужно объяснить слово одним из трёх способов: словами, рисунком или пантомимой. Способ определяется случайно.',
-    minPlayers: 4,
-    maxPlayers: 16,
-    duration: '30-60 мин',
-    difficulty: 'easy',
-    hostMode: 'none',
+    tagline: {
+      ru: 'Объясни, нарисуй или покажи',
+      en: 'Explain, draw, or act it out',
+    },
+    description: {
+      ru: 'Командная игра: объясните слово словами, рисунком или пантомимой. Способ определяется случайно.',
+      en: 'Team game: explain a word by speaking, drawing, or miming. The method is chosen randomly.',
+    },
+    minPlayers: 4, maxPlayers: 16, duration: '30-60 min', difficulty: 'easy', hostMode: 'none',
     categories: ['party', 'word', 'creative'],
-    howToPlay: [
-      'Разделитесь на команды',
-      'Вытяните карту — на ней слово и способ объяснения',
-      'Объясните: словами (как в Alias), рисунком (как в Pictionary) или жестами (как в Крокодиле)',
-      'У команды есть 60 секунд на угадывание',
-      'Побеждает команда, первой набравшая нужное количество очков',
-    ],
-    commonMistakes: [
-      'Путают способы — если выпало «рисовать», нельзя говорить и наоборот',
-      'При рисовании пишут буквы и цифры — это запрещено',
-      'При пантомиме издают звуки — нельзя',
-      'При объяснении словами показывают жестами — нельзя',
-    ],
+    howToPlay: {
+      ru: ['Разделитесь на команды', 'Вытяните карту с заданием и способом', 'Объясните: словами, рисунком или жестами', '60 секунд на угадывание', 'Первая команда, набравшая цель — побеждает'],
+      en: ['Split into teams', 'Draw a card with a word and method', 'Explain by: speaking, drawing, or miming', '60 seconds to guess', 'First team to reach the target score wins'],
+    },
+    commonMistakes: {
+      ru: ['Путают способы — если рисовать, нельзя говорить', 'При рисовании пишут буквы — запрещено', 'При пантомиме издают звуки — нельзя', 'При объяснении показывают жестами — нельзя'],
+      en: ['Mixing methods — if drawing, you can\'t speak', 'Writing letters while drawing — forbidden', 'Making sounds while miming — not allowed', 'Using gestures while explaining verbally — not allowed'],
+    },
     component: ActivityGame,
   },
   {
@@ -272,27 +308,40 @@ export const games: GameInfo[] = [
     name: 'Данетки',
     nameEn: 'Black Stories',
     emoji: '🔮',
-    tagline: 'Разгадай историю — только Да или Нет',
-    description: 'Ведущий зачитывает странную ситуацию. Игроки задают вопросы, на которые можно ответить только «Да», «Нет» или «Неважно». Нужно разгадать, что произошло.',
-    minPlayers: 2,
-    maxPlayers: 20,
-    duration: '15-30 мин',
-    difficulty: 'medium',
-    hostMode: 'required',
+    tagline: {
+      ru: 'Разгадай историю — только Да или Нет',
+      en: 'Solve the mystery — Yes or No only',
+    },
+    description: {
+      ru: 'Ведущий зачитывает странную ситуацию. Игроки задают вопросы: только «Да», «Нет» или «Неважно».',
+      en: 'The host reads a strange situation. Players ask questions that can only be answered "Yes", "No", or "Irrelevant".',
+    },
+    minPlayers: 2, maxPlayers: 20, duration: '15-30 min', difficulty: 'medium', hostMode: 'required',
     categories: ['detective'],
-    howToPlay: [
-      'Ведущий зачитывает загадочную ситуацию',
-      'Игроки по очереди задают вопросы',
-      'Ведущий отвечает только: «Да», «Нет» или «Не имеет значения»',
-      'Игроки пытаются восстановить полную картину происходящего',
-      'Если застряли — ведущий может дать подсказку',
-    ],
-    commonMistakes: [
-      'Задают открытые вопросы вместо закрытых — только да/нет',
-      'Ведущий отвечает слишком подробно — только три варианта ответа',
-      'Гадают «в лоб» без анализа — нужно строить цепочку рассуждений',
-      'Ведущий подсматривает ответ при каждом вопросе — лучше прочитать заранее',
-    ],
+    howToPlay: {
+      ru: ['Ведущий зачитывает ситуацию', 'Игроки задают вопросы по очереди', 'Ведущий отвечает: Да / Нет / Неважно', 'Восстановите полную картину', 'Если застряли — ведущий даёт подсказку'],
+      en: ['The host reads the situation', 'Players ask questions one by one', 'Host answers: Yes / No / Irrelevant', 'Reconstruct the full story', 'If stuck — the host gives a hint'],
+    },
+    commonMistakes: {
+      ru: ['Открытые вопросы вместо закрытых — только да/нет', 'Ведущий отвечает подробно — только 3 варианта', 'Гадают без анализа — стройте цепочку', 'Ведущий подсматривает при каждом вопросе — прочитайте заранее'],
+      en: ['Asking open questions instead of yes/no — only closed questions', 'Host gives detailed answers — only 3 options', 'Random guessing without analysis — build a chain of reasoning', 'Host checks the answer every time — read it beforehand'],
+    },
     component: DanetkiGame,
   },
 ]
+
+// Export games with current language support
+// Components read lang from useI18n hook and use L(ru, en) pattern
+export function getGames(lang: string): GameInfo[] {
+  const isRu = lang === 'ru'
+  return gamesData.map(g => ({
+    ...g,
+    tagline: isRu ? g.tagline.ru : g.tagline.en,
+    description: isRu ? g.description.ru : g.description.en,
+    howToPlay: isRu ? g.howToPlay.ru : g.howToPlay.en,
+    commonMistakes: isRu ? g.commonMistakes.ru : g.commonMistakes.en,
+  }))
+}
+
+// Default export for backward compat — uses English
+export const games = getGames('en')

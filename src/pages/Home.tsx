@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowRight, Users, Timer, Zap, Shield, Globe, ChevronDown } from 'lucide-react'
 import { useI18n, LANGUAGES, LangCode } from '../i18n'
-import { games } from '../games/registry'
+import { getGames } from '../games/registry'
 import { useState } from 'react'
 
 const fadeUp = {
@@ -21,6 +21,7 @@ const stagger = {
 export default function Home() {
   const { t, lang, setLang } = useI18n()
   const [langOpen, setLangOpen] = useState(false)
+  const games = getGames(lang)
 
   return (
     <div className="min-h-screen">

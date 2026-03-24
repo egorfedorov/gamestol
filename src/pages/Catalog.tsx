@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Search, Users, Clock, Star, UserCog, Smartphone } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useI18n } from '../i18n'
-import { games } from '../games/registry'
+import { getGames } from '../games/registry'
 import clsx from 'clsx'
 
 const categories = ['all', 'party', 'word', 'strategy', 'detective', 'creative']
@@ -24,6 +24,7 @@ export default function Catalog() {
   const [category, setCategory] = useState('all')
 
   const labels = categoryLabels[lang] || categoryLabels.en
+  const games = getGames(lang)
 
   const filtered = games.filter(game => {
     const matchSearch = game.name.toLowerCase().includes(search.toLowerCase()) ||

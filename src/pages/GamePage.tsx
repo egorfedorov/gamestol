@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { ChevronLeft, Play, BookOpen, AlertTriangle, Users, Clock, ChevronDown, ChevronUp, UserCog, Smartphone } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useI18n } from '../i18n'
-import { games } from '../games/registry'
+import { getGames } from '../games/registry'
 import clsx from 'clsx'
 
 const hostBadge = {
@@ -19,6 +19,7 @@ export default function GamePage() {
   const [showRules, setShowRules] = useState(false)
   const [showMistakes, setShowMistakes] = useState(false)
 
+  const games = getGames(lang)
   const game = games.find(g => g.id === id)
   if (!game) {
     return (
