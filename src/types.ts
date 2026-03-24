@@ -6,6 +6,7 @@ export interface GameInfo {
   id: string
   name: string
   nameEn: string
+  nameAlt: string
   emoji: string
   tagline: string
   description: string

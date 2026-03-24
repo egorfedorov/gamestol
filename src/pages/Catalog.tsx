@@ -80,7 +80,7 @@ export default function Catalog() {
               <h3 className="text-lg font-semibold mb-1 group-hover:text-accent transition-colors">
                 {game.name}
               </h3>
-              <p className="text-text-muted text-xs mb-3">{game.nameEn}</p>
+              <p className="text-text-muted text-xs mb-3">{game.nameAlt}</p>
               <p className="text-text-secondary text-sm leading-relaxed flex-1 mb-4">
                 {game.tagline}
               </p>

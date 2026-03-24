@@ -60,7 +60,7 @@ export default function GamePage() {
           <span className="text-5xl">{game.emoji}</span>
           <div>
             <h1 className="text-3xl font-bold">{game.name}</h1>
-            <p className="text-text-muted text-sm">{game.nameEn}</p>
+            <p className="text-text-muted text-sm">{game.nameAlt}</p>
           </div>
         </div>
         <p className="text-text-secondary text-lg leading-relaxed mb-6">{game.description}</p>

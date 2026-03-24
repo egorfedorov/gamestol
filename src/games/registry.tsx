@@ -10,7 +10,7 @@ import ImaginariumGame from './ImaginariumGame'
 import ActivityGame from './ActivityGame'
 import DanetkiGame from './DanetkiGame'
 
-interface BilingualGameInfo extends Omit<GameInfo, 'tagline' | 'description' | 'howToPlay' | 'commonMistakes'> {
+interface BilingualGameInfo extends Omit<GameInfo, 'nameAlt' | 'tagline' | 'description' | 'howToPlay' | 'commonMistakes'> {
   tagline: { ru: string; en: string }
   description: { ru: string; en: string }
   howToPlay: { ru: string[]; en: string[] }
@@ -336,6 +336,8 @@ export function getGames(lang: string): GameInfo[] {
   const isRu = lang === 'ru'
   return gamesData.map(g => ({
     ...g,
+    name: isRu ? g.name : g.nameEn,
+    nameAlt: isRu ? g.nameEn : g.name,
     tagline: isRu ? g.tagline.ru : g.tagline.en,
     description: isRu ? g.description.ru : g.description.en,
     howToPlay: isRu ? g.howToPlay.ru : g.howToPlay.en,
