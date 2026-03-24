@@ -4,6 +4,7 @@ import { ArrowRight, Users, Timer, Zap, Shield, Globe, ChevronDown } from 'lucid
 import { useI18n, LANGUAGES, LangCode } from '../i18n'
 import { getGames } from '../games/registry'
 import { useState } from 'react'
+import clsx from 'clsx'
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -176,6 +177,35 @@ export default function Home() {
               <ArrowRight size={18} />
             </Link>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Languages */}
+      <section className="py-16 sm:py-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <motion.div {...fadeUp} className="text-center mb-10">
+            <p className="text-text-muted text-sm uppercase tracking-widest mb-3">
+              {lang === 'ru' ? 'Доступные языки' : 'Available Languages'}
+            </p>
+            <h2 className="section-title">12 {lang === 'ru' ? 'языков' : 'languages'}</h2>
+          </motion.div>
+          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+            {LANGUAGES.map((l, i) => (
+              <motion.button key={l.code} {...stagger} transition={{ duration: 0.3, delay: i * 0.04 }}
+                onClick={() => setLang(l.code as LangCode)}
+                className={clsx(
+                  'card p-4 flex flex-col items-center gap-2 transition-all',
+                  lang === l.code
+                    ? 'border-accent/40 bg-accent/5'
+                    : 'hover:border-border-light hover:bg-bg-hover'
+                )}>
+                <span className="text-2xl">{l.flag}</span>
+                <span className={clsx('text-xs font-medium',
+                  lang === l.code ? 'text-accent' : 'text-text-secondary'
+                )}>{l.name}</span>
+              </motion.button>
+            ))}
+          </div>
         </div>
       </section>
 
