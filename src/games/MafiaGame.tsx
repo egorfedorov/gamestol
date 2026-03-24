@@ -1,12 +1,13 @@
-import { useState, useCallback } from 'react'
-import { Moon, Sun, Eye, EyeOff, SkipForward, Vote, Skull, Heart, Shield, Search } from 'lucide-react'
+import { useState } from 'react'
+import { Moon, Sun, Eye, SkipForward, Vote, Skull, Heart, Shield, Search, UserCog, Smartphone } from 'lucide-react'
 import { useI18n } from '../i18n'
 import PlayerSetup from '../components/PlayerSetup'
 import { Player } from '../types'
 import clsx from 'clsx'
 
 type Role = 'mafia' | 'citizen' | 'doctor' | 'detective'
-type Phase = 'setup' | 'roles' | 'night' | 'day' | 'vote' | 'end'
+type Phase = 'setup' | 'mode' | 'assign_roles' | 'roles' | 'night' | 'day' | 'vote' | 'end'
+type GameMode = 'host' | 'self'
 
 interface MafiaPlayer extends Player {
   role: Role
@@ -20,11 +21,12 @@ const roleConfig: Record<Role, { label: string; labelEn: string; icon: any; colo
   detective: { label: 'Комиссар', labelEn: 'Detective', icon: Search, color: 'text-amber-400' },
 }
 
-function assignRoles(players: Player[]): MafiaPlayer[] {
+const allRoles: Role[] = ['mafia', 'citizen', 'doctor', 'detective']
+
+function assignRolesRandom(players: Player[]): MafiaPlayer[] {
   const count = players.length
   const mafiaCount = count <= 7 ? 1 : count <= 11 ? 2 : 3
   const shuffled = [...players].sort(() => Math.random() - 0.5)
-
   return shuffled.map((p, i) => ({
     ...p,
     isAlive: true,
@@ -38,10 +40,15 @@ function assignRoles(players: Player[]): MafiaPlayer[] {
 export default function MafiaGame() {
   const { t, lang } = useI18n()
   const [phase, setPhase] = useState<Phase>('setup')
+  const [mode, setMode] = useState<GameMode>('host')
   const [players, setPlayers] = useState<Player[]>([])
   const [gamePlayers, setGamePlayers] = useState<MafiaPlayer[]>([])
+  // Manual role assignment state
+  const [roleAssignments, setRoleAssignments] = useState<Record<string, Role>>({})
+  // Self-mode role reveal
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
   const [showRole, setShowRole] = useState(false)
+  // Game state
   const [night, setNight] = useState(1)
   const [nightPhase, setNightPhase] = useState<'mafia' | 'doctor' | 'detective'>('mafia')
   const [mafiaTarget, setMafiaTarget] = useState<string | null>(null)
@@ -55,13 +62,54 @@ export default function MafiaGame() {
   const mafiaAlive = alive.filter(p => p.role === 'mafia')
   const citizensAlive = alive.filter(p => p.role !== 'mafia')
 
-  const startGame = () => {
-    if (players.length < 6) return
-    const assigned = assignRoles(players)
-    setGamePlayers(assigned)
-    setPhase('roles')
-    setCurrentRoleIndex(0)
-    setShowRole(false)
+  // Role counts for manual assignment
+  const assignedRoles = Object.values(roleAssignments)
+  const mafiaAssigned = assignedRoles.filter(r => r === 'mafia').length
+  const doctorAssigned = assignedRoles.filter(r => r === 'doctor').length
+  const detectiveAssigned = assignedRoles.filter(r => r === 'detective').length
+  const suggestedMafia = players.length <= 7 ? 1 : players.length <= 11 ? 2 : 3
+
+  const canStartManual = () => {
+    return players.every(p => roleAssignments[p.id]) && mafiaAssigned >= 1
+  }
+
+  const goToMode = () => {
+    if (players.length < 4) return
+    setPhase('mode')
+  }
+
+  const selectMode = (m: GameMode) => {
+    setMode(m)
+    if (m === 'host') {
+      // Init all as citizen
+      const initial: Record<string, Role> = {}
+      players.forEach(p => { initial[p.id] = 'citizen' })
+      setRoleAssignments(initial)
+      setPhase('assign_roles')
+    } else {
+      // Random assignment, then reveal
+      const assigned = assignRolesRandom(players)
+      setGamePlayers(assigned)
+      setPhase('roles')
+      setCurrentRoleIndex(0)
+      setShowRole(false)
+    }
+  }
+
+  const setPlayerRole = (playerId: string, role: Role) => {
+    setRoleAssignments(prev => ({ ...prev, [playerId]: role }))
+  }
+
+  const startFromManual = () => {
+    const gp: MafiaPlayer[] = players.map(p => ({
+      ...p,
+      isAlive: true,
+      role: roleAssignments[p.id] || 'citizen',
+    }))
+    setGamePlayers(gp)
+    setPhase('night')
+    setNightPhase('mafia')
+    setNight(1)
   }
 
   const nextRole = () => {
@@ -80,7 +128,6 @@ export default function MafiaGame() {
     } else if (nightPhase === 'doctor') {
       setNightPhase('detective')
     } else {
-      // Resolve night
       const target = gamePlayers.find(p => p.id === mafiaTarget)
       const saved = mafiaTarget === doctorTarget
       const detected = gamePlayers.find(p => p.id === detectiveTarget)
@@ -93,7 +140,7 @@ export default function MafiaGame() {
           ? `Этой ночью был убит: ${target.name}`
           : `Killed tonight: ${target.name}`)
       } else if (saved) {
-        setNightResult(lang === 'ru' ? 'Доктор спас жертву! Никто не погиб.' : 'The doctor saved the victim! No one died.')
+        setNightResult(lang === 'ru' ? 'Доктор спас жертву! Никто не погиб.' : 'The doctor saved the victim!')
       } else {
         setNightResult(lang === 'ru' ? 'Никто не погиб этой ночью.' : 'No one died tonight.')
       }
@@ -103,7 +150,6 @@ export default function MafiaGame() {
           ? (lang === 'ru' ? `${detected.name} — МАФИЯ!` : `${detected.name} — MAFIA!`)
           : (lang === 'ru' ? `${detected.name} — мирный` : `${detected.name} — civilian`))
       }
-
       setPhase('day')
     }
   }
@@ -118,7 +164,6 @@ export default function MafiaGame() {
     setGamePlayers(prev => prev.map(p =>
       p.id === voteTarget ? { ...p, isAlive: false } : p
     ))
-    // Check win condition
     const newAlive = gamePlayers.filter(p => p.isAlive && p.id !== voteTarget)
     const newMafia = newAlive.filter(p => p.role === 'mafia')
     const newCitizens = newAlive.filter(p => p.role !== 'mafia')
@@ -126,14 +171,7 @@ export default function MafiaGame() {
     if (newMafia.length === 0 || newMafia.length >= newCitizens.length) {
       setPhase('end')
     } else {
-      setNight(prev => prev + 1)
-      setPhase('night')
-      setNightPhase('mafia')
-      setMafiaTarget(null)
-      setDoctorTarget(null)
-      setDetectiveTarget(null)
-      setDetectiveResult(null)
-      setNightResult(null)
+      goToNextNight()
     }
   }
 
@@ -141,15 +179,19 @@ export default function MafiaGame() {
     if (mafiaAlive.length >= citizensAlive.length) {
       setPhase('end')
     } else {
-      setNight(prev => prev + 1)
-      setPhase('night')
-      setNightPhase('mafia')
-      setMafiaTarget(null)
-      setDoctorTarget(null)
-      setDetectiveTarget(null)
-      setDetectiveResult(null)
-      setNightResult(null)
+      goToNextNight()
     }
+  }
+
+  const goToNextNight = () => {
+    setNight(prev => prev + 1)
+    setPhase('night')
+    setNightPhase('mafia')
+    setMafiaTarget(null)
+    setDoctorTarget(null)
+    setDetectiveTarget(null)
+    setDetectiveResult(null)
+    setNightResult(null)
   }
 
   const resetGame = () => {
@@ -158,32 +200,156 @@ export default function MafiaGame() {
     setNight(1)
     setNightResult(null)
     setDetectiveResult(null)
+    setRoleAssignments({})
   }
 
-  // SETUP
+  // ──────── SETUP ────────
   if (phase === 'setup') {
     return (
       <div className="space-y-6">
         <h2 className="text-2xl font-bold">🎭 {lang === 'ru' ? 'Мафия' : 'Mafia'}</h2>
-        <PlayerSetup players={players} onChange={setPlayers} min={6} max={20} />
-        {players.length >= 6 && (
-          <div className="card p-4 text-sm text-text-secondary space-y-1">
-            <p>{lang === 'ru' ? 'Роли' : 'Roles'}:</p>
-            <p>• {lang === 'ru' ? 'Мафия' : 'Mafia'}: {players.length <= 7 ? 1 : players.length <= 11 ? 2 : 3}</p>
-            <p>• {lang === 'ru' ? 'Доктор' : 'Doctor'}: 1</p>
-            <p>• {lang === 'ru' ? 'Комиссар' : 'Detective'}: 1</p>
-            <p>• {lang === 'ru' ? 'Мирные' : 'Citizens'}: {players.length - (players.length <= 7 ? 1 : players.length <= 11 ? 2 : 3) - 2}</p>
-          </div>
-        )}
-        <button onClick={startGame} disabled={players.length < 6}
+        <PlayerSetup players={players} onChange={setPlayers} min={4} max={20} />
+        <button onClick={goToMode} disabled={players.length < 4}
           className="btn-primary w-full disabled:opacity-40">
-          {t.game.start_game}
+          {t.game.next}
         </button>
       </div>
     )
   }
 
-  // ROLE REVEAL
+  // ──────── MODE SELECT ────────
+  if (phase === 'mode') {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-2xl font-bold">🎭 {lang === 'ru' ? 'Мафия' : 'Mafia'}</h2>
+        <p className="text-text-secondary text-sm">
+          {lang === 'ru' ? 'Как будете играть?' : 'How will you play?'}
+        </p>
+
+        <button onClick={() => selectMode('host')}
+          className="w-full card-hover p-5 text-left space-y-2">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+              <UserCog size={20} className="text-accent" />
+            </div>
+            <div>
+              <p className="font-semibold">{lang === 'ru' ? 'С ведущим' : 'With Host'}</p>
+              <p className="text-text-muted text-xs">{lang === 'ru' ? 'Ведущий назначает роли и управляет игрой' : 'Host assigns roles and manages the game'}</p>
+            </div>
+          </div>
+          <div className="text-text-secondary text-xs pl-[52px] space-y-1">
+            <p>{lang === 'ru' ? '• Ведущий выбирает, кто будет мафией, доктором и т.д.' : '• Host decides who is mafia, doctor, etc.'}</p>
+            <p>{lang === 'ru' ? '• Ведущий видит все роли на своём экране' : '• Host sees all roles on their screen'}</p>
+            <p>{lang === 'ru' ? '• Ведущий управляет ночными фазами' : '• Host manages night phases'}</p>
+          </div>
+        </button>
+
+        <button onClick={() => selectMode('self')}
+          className="w-full card-hover p-5 text-left space-y-2">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+              <Smartphone size={20} className="text-blue-400" />
+            </div>
+            <div>
+              <p className="font-semibold">{lang === 'ru' ? 'Без ведущего' : 'Without Host'}</p>
+              <p className="text-text-muted text-xs">{lang === 'ru' ? 'Телефон раздаёт роли и ведёт игру' : 'Phone deals roles and runs the game'}</p>
+            </div>
+          </div>
+          <div className="text-text-secondary text-xs pl-[52px] space-y-1">
+            <p>{lang === 'ru' ? '• Роли раздаются случайно' : '• Roles are assigned randomly'}</p>
+            <p>{lang === 'ru' ? '• Каждый смотрит роль тайно на телефоне' : '• Each player views their role secretly'}</p>
+            <p>{lang === 'ru' ? '• Телефон ставится в центр стола' : '• Phone goes in the center of the table'}</p>
+          </div>
+        </button>
+      </div>
+    )
+  }
+
+  // ──────── MANUAL ROLE ASSIGNMENT (Host mode) ────────
+  if (phase === 'assign_roles') {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-xl font-bold">
+          {lang === 'ru' ? '🎭 Назначение ролей' : '🎭 Assign Roles'}
+        </h2>
+        <p className="text-text-secondary text-sm">
+          {lang === 'ru'
+            ? 'Выберите роль для каждого игрока. Рекомендуется: мафия — ' + suggestedMafia + ', доктор — 1, комиссар — 1.'
+            : 'Choose a role for each player. Recommended: mafia — ' + suggestedMafia + ', doctor — 1, detective — 1.'}
+        </p>
+
+        {/* Role counters */}
+        <div className="grid grid-cols-4 gap-2">
+          {allRoles.map(role => {
+            const rc = roleConfig[role]
+            const Icon = rc.icon
+            const count = assignedRoles.filter(r => r === role).length
+            return (
+              <div key={role} className="card p-3 text-center">
+                <Icon size={16} className={clsx('mx-auto mb-1', rc.color)} />
+                <p className="text-xs font-medium">{lang === 'ru' ? rc.label : rc.labelEn}</p>
+                <p className={clsx('text-lg font-mono font-bold', rc.color)}>{count}</p>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Player list with role selectors */}
+        <div className="space-y-2">
+          {players.map(p => {
+            const currentRole = roleAssignments[p.id] || 'citizen'
+            return (
+              <div key={p.id} className="card p-3">
+                <p className="font-medium text-sm mb-2">{p.name}</p>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {allRoles.map(role => {
+                    const rc = roleConfig[role]
+                    const Icon = rc.icon
+                    const isSelected = currentRole === role
+                    return (
+                      <button key={role} onClick={() => setPlayerRole(p.id, role)}
+                        className={clsx(
+                          'flex flex-col items-center gap-1 py-2 px-1 rounded-lg text-[10px] font-medium transition-all',
+                          isSelected
+                            ? `${rc.color} bg-current/10 border border-current/30`
+                            : 'text-text-muted bg-bg-surface hover:bg-bg-hover border border-transparent'
+                        )}
+                        style={isSelected ? {
+                          backgroundColor: role === 'mafia' ? 'rgba(248,113,113,0.1)'
+                            : role === 'doctor' ? 'rgba(52,211,153,0.1)'
+                            : role === 'detective' ? 'rgba(251,191,36,0.1)'
+                            : 'rgba(96,165,250,0.1)',
+                          borderColor: role === 'mafia' ? 'rgba(248,113,113,0.3)'
+                            : role === 'doctor' ? 'rgba(52,211,153,0.3)'
+                            : role === 'detective' ? 'rgba(251,191,36,0.3)'
+                            : 'rgba(96,165,250,0.3)',
+                        } : undefined}>
+                        <Icon size={14} />
+                        <span>{lang === 'ru' ? rc.label : rc.labelEn}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {mafiaAssigned === 0 && (
+          <p className="text-red-400 text-xs text-center">
+            {lang === 'ru' ? 'Назначьте хотя бы одного мафиози' : 'Assign at least one mafia member'}
+          </p>
+        )}
+
+        <button onClick={startFromManual} disabled={!canStartManual()}
+          className="btn-primary w-full disabled:opacity-40">
+          {lang === 'ru' ? 'Начать игру' : 'Start Game'}
+        </button>
+      </div>
+    )
+  }
+
+  // ──────── SELF MODE: Role Reveal (pass phone) ────────
   if (phase === 'roles') {
     const current = gamePlayers[currentRoleIndex]
     const rc = roleConfig[current.role]
@@ -219,7 +385,7 @@ export default function MafiaGame() {
     )
   }
 
-  // NIGHT
+  // ──────── NIGHT ────────
   if (phase === 'night') {
     const phaseLabel = {
       mafia: { ru: '🔪 Мафия выбирает жертву', en: '🔪 Mafia chooses a victim' },
@@ -231,6 +397,27 @@ export default function MafiaGame() {
     const setCurrentTarget = nightPhase === 'mafia' ? setMafiaTarget
       : nightPhase === 'doctor' ? setDoctorTarget : setDetectiveTarget
 
+    // In host mode, show who has which role for reference
+    const roleHolders = nightPhase === 'mafia'
+      ? alive.filter(p => p.role === 'mafia').map(p => p.name).join(', ')
+      : nightPhase === 'doctor'
+        ? alive.filter(p => p.role === 'doctor').map(p => p.name).join(', ')
+        : alive.filter(p => p.role === 'detective').map(p => p.name).join(', ')
+
+    // Check if the role exists among alive players
+    const roleExists = nightPhase === 'mafia'
+      ? alive.some(p => p.role === 'mafia')
+      : nightPhase === 'doctor'
+        ? alive.some(p => p.role === 'doctor')
+        : alive.some(p => p.role === 'detective')
+
+    // If the role holder is dead, skip this phase
+    if (!roleExists && nightPhase !== 'mafia') {
+      // Auto-advance
+      setTimeout(() => confirmNightAction(), 0)
+      return null
+    }
+
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -238,15 +425,25 @@ export default function MafiaGame() {
             <Moon size={16} />
             {lang === 'ru' ? `Ночь ${night}` : `Night ${night}`}
           </div>
+          {mode === 'host' && (
+            <span className="text-xs text-text-muted">
+              {lang === 'ru' ? 'Режим ведущего' : 'Host mode'}
+            </span>
+          )}
         </div>
+
         <div className="card p-6 text-center">
-          <p className="text-lg font-medium mb-6">
+          <p className="text-lg font-medium mb-2">
             {lang === 'ru' ? phaseLabel[nightPhase].ru : phaseLabel[nightPhase].en}
           </p>
+          {mode === 'host' && roleHolders && (
+            <p className="text-xs text-accent mb-4">
+              {nightPhase === 'mafia' ? '🔪' : nightPhase === 'doctor' ? '💊' : '🔍'} {roleHolders}
+            </p>
+          )}
           <div className="space-y-2">
             {alive.map(p => {
-              // Mafia can't target themselves, doctor can target anyone, detective can target anyone except mafia
-              const isMafia = gamePlayers.find(gp => gp.id === p.id)?.role === 'mafia'
+              const isMafia = p.role === 'mafia'
               if (nightPhase === 'mafia' && isMafia) return null
               return (
                 <button key={p.id} onClick={() => setCurrentTarget(p.id)}
@@ -257,6 +454,11 @@ export default function MafiaGame() {
                       : 'bg-bg-surface border border-transparent hover:border-border'
                   )}>
                   {p.name}
+                  {mode === 'host' && (
+                    <span className={clsx('ml-2 text-xs', roleConfig[p.role].color)}>
+                      ({lang === 'ru' ? roleConfig[p.role].label : roleConfig[p.role].labelEn})
+                    </span>
+                  )}
                 </button>
               )
             })}
@@ -270,7 +472,7 @@ export default function MafiaGame() {
     )
   }
 
-  // DAY
+  // ──────── DAY ────────
   if (phase === 'day') {
     return (
       <div className="space-y-6">
@@ -287,7 +489,9 @@ export default function MafiaGame() {
 
         {detectiveResult && (
           <div className="card p-5 border-amber-500/20 bg-amber-500/5">
-            <p className="text-xs text-text-muted mb-1">{lang === 'ru' ? 'Результат проверки (только для комиссара):' : 'Check result (detective only):'}</p>
+            <p className="text-xs text-text-muted mb-1">
+              {lang === 'ru' ? 'Результат проверки (только для комиссара):' : 'Check result (detective only):'}
+            </p>
             <p className="text-sm font-medium">{detectiveResult}</p>
           </div>
         )}
@@ -301,7 +505,14 @@ export default function MafiaGame() {
               <span key={p.id} className={clsx(
                 'px-3 py-1.5 rounded-full text-xs',
                 p.isAlive ? 'bg-bg-surface text-text' : 'bg-bg-surface/50 text-text-muted line-through'
-              )}>{p.name}</span>
+              )}>
+                {p.name}
+                {mode === 'host' && p.isAlive && (
+                  <span className={clsx('ml-1', roleConfig[p.role].color)}>
+                    ({lang === 'ru' ? roleConfig[p.role].label[0] : roleConfig[p.role].labelEn[0]})
+                  </span>
+                )}
+              </span>
             ))}
           </div>
         </div>
@@ -317,14 +528,14 @@ export default function MafiaGame() {
           </button>
           <button onClick={skipVote} className="btn-secondary flex-1">
             <SkipForward size={18} />
-            {lang === 'ru' ? 'Без голосования' : 'Skip Vote'}
+            {lang === 'ru' ? 'Пропустить' : 'Skip'}
           </button>
         </div>
       </div>
     )
   }
 
-  // VOTE
+  // ──────── VOTE ────────
   if (phase === 'vote') {
     return (
       <div className="space-y-6">
@@ -356,7 +567,7 @@ export default function MafiaGame() {
     )
   }
 
-  // END
+  // ──────── END ────────
   if (phase === 'end') {
     const mafiaWon = mafiaAlive.length >= citizensAlive.length
     return (
