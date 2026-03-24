@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Minus, RotateCcw, Trophy } from 'lucide-react'
+import { Plus, Minus, RotateCcw, Trophy, SkipForward } from 'lucide-react'
 import { useI18n } from '../i18n'
 import PlayerSetup from '../components/PlayerSetup'
 import { Player } from '../types'
@@ -9,6 +9,8 @@ type Phase = 'setup' | 'playing' | 'end'
 
 export default function ImaginariumGame() {
   const { t, lang } = useI18n()
+  const L = (ru: string, en: string) => lang === 'ru' ? ru : en
+
   const [phase, setPhase] = useState<Phase>('setup')
   const [players, setPlayers] = useState<Player[]>([])
   const [round, setRound] = useState(1)
@@ -44,41 +46,78 @@ export default function ImaginariumGame() {
     setStorytellerIndex(0)
   }
 
+  // ═══════════════════════════════════════════
+  // SETUP
+  // ═══════════════════════════════════════════
   if (phase === 'setup') {
     return (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold">🎨 {lang === 'ru' ? 'Имаджинариум' : 'Imaginarium'}</h2>
+        <h2 className="text-2xl font-bold">{L('Имаджинариум', 'Imaginarium')}</h2>
+
+        <div className="card p-4 text-sm text-text-secondary space-y-1">
+          <p className="font-medium text-text mb-2">{L('Как играть:', 'How to play:')}</p>
+          <p>1. {L('Рассказчик загадывает ассоциацию к своей карте', 'The storyteller gives a clue for their card')}</p>
+          <p>2. {L('Остальные выбирают из своих карт самую подходящую', 'Others pick the card from their hand that best matches')}</p>
+          <p>3. {L('Все карты перемешиваются, игроки голосуют', 'All cards are shuffled, players vote')}</p>
+          <p>4. {L('Очки начисляются по результатам голосования', 'Points are awarded based on the votes')}</p>
+        </div>
+
+        <div className="card p-4 text-sm text-text-secondary space-y-2">
+          <p className="font-medium text-text">{L('Подсчёт очков:', 'Scoring rules:')}</p>
+          <p className="text-text-muted">{L(
+            '═══ Если ВСЕ или НИКТО не угадал карту рассказчика:',
+            '═══ If ALL or NONE guessed the storyteller\'s card:'
+          )}</p>
+          <p>{L('• Рассказчик: 0 очков', '• Storyteller: 0 points')}</p>
+          <p>{L('• Все остальные: +2 очка', '• Everyone else: +2 points')}</p>
+          <p className="text-text-muted mt-1">{L(
+            '═══ Если угадали НЕКОТОРЫЕ:',
+            '═══ If SOME guessed correctly:'
+          )}</p>
+          <p>{L('• Рассказчик: +3 очка', '• Storyteller: +3 points')}</p>
+          <p>{L('• Каждый угадавший: +3 очка', '• Each correct guesser: +3 points')}</p>
+          <p className="text-text-muted mt-1">{L(
+            '═══ Бонус:',
+            '═══ Bonus:'
+          )}</p>
+          <p>{L('• За каждый голос за ВАШУ карту (не рассказчик): +1 очко', '• For each vote on YOUR card (non-storyteller): +1 point')}</p>
+        </div>
+
         <PlayerSetup players={players} onChange={setPlayers} min={3} max={8} />
+
         <div className="card p-4">
           <label className="text-sm text-text-secondary block mb-2">
-            {lang === 'ru' ? 'Цель (очки)' : 'Target'}: {targetScore}
+            {L('Цель', 'Target score')}: <span className="text-text font-mono">{targetScore}</span> {t.game.points}
           </label>
           <input type="range" min={15} max={50} step={5} value={targetScore}
             onChange={e => setTargetScore(Number(e.target.value))} className="w-full accent-accent" />
         </div>
-        <div className="card p-4 text-sm text-text-secondary space-y-2">
-          <p className="font-medium text-text">{lang === 'ru' ? 'Подсчёт очков:' : 'Scoring:'}</p>
-          <p>{lang === 'ru' ? '• Если ВСЕ или НИКТО не угадал — рассказчик: 0, остальные: +2' : '• If ALL or NONE guessed — storyteller: 0, others: +2'}</p>
-          <p>{lang === 'ru' ? '• Иначе — рассказчик: +3, угадавшие: +3' : '• Otherwise — storyteller: +3, guessers: +3'}</p>
-          <p>{lang === 'ru' ? '• За каждый голос за свою карту: +1' : '• For each vote on your card: +1'}</p>
-        </div>
+
         <button onClick={startGame} disabled={players.length < 3}
           className="btn-primary w-full disabled:opacity-40">{t.game.start_game}</button>
       </div>
     )
   }
 
+  // ═══════════════════════════════════════════
+  // PLAYING
+  // ═══════════════════════════════════════════
   if (phase === 'playing') {
     const storyteller = players[storytellerIndex]
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <span className="game-phase-indicator">{t.game.round} {round}</span>
-          <span className="text-sm text-text-muted">{lang === 'ru' ? 'Цель' : 'Target'}: {targetScore}</span>
+          <span className="game-phase-indicator">
+            {L('Раунд', 'Round')} {round}
+          </span>
+          <span className="text-sm text-text-muted">
+            {L('Цель', 'Target')}: {targetScore}
+          </span>
         </div>
 
+        {/* Storyteller card */}
         <div className="card p-5 border-accent/20 text-center">
-          <p className="text-sm text-text-muted mb-1">{lang === 'ru' ? 'Рассказчик' : 'Storyteller'}</p>
+          <p className="text-sm text-text-muted mb-1">{L('Рассказчик', 'Storyteller')}</p>
           <p className="text-xl font-bold text-accent">{storyteller.name}</p>
         </div>
 
@@ -95,16 +134,19 @@ export default function ImaginariumGame() {
               </span>
               <div className="flex items-center gap-2">
                 <button onClick={() => addScore(p.id, -1)}
-                  className="w-8 h-8 rounded-lg bg-bg-hover flex items-center justify-center text-text-muted hover:text-red-400 transition-colors">
-                  <Minus size={14} />
+                  className="w-10 h-10 rounded-xl bg-bg-hover flex items-center justify-center text-text-muted
+                    hover:text-red-400 active:scale-95 transition-all touch-manipulation">
+                  <Minus size={16} />
                 </button>
                 <span className="font-mono text-lg w-8 text-center">{p.score}</span>
                 <button onClick={() => addScore(p.id, 1)}
-                  className="w-8 h-8 rounded-lg bg-bg-hover flex items-center justify-center text-text-muted hover:text-emerald-400 transition-colors">
-                  <Plus size={14} />
+                  className="w-10 h-10 rounded-xl bg-bg-hover flex items-center justify-center text-text-muted
+                    hover:text-emerald-400 active:scale-95 transition-all touch-manipulation">
+                  <Plus size={16} />
                 </button>
                 <button onClick={() => addScore(p.id, 3)}
-                  className="px-2 h-8 rounded-lg bg-accent/10 text-accent text-xs font-medium hover:bg-accent/20 transition-colors">
+                  className="px-3 h-10 rounded-xl bg-accent/10 text-accent text-sm font-semibold
+                    hover:bg-accent/20 active:scale-95 transition-all touch-manipulation">
                   +3
                 </button>
               </div>
@@ -113,7 +155,8 @@ export default function ImaginariumGame() {
         </div>
 
         {/* Progress bar */}
-        <div className="space-y-1">
+        <div className="card p-4 space-y-2">
+          <p className="text-xs text-text-muted font-medium mb-1">{L('Прогресс', 'Progress')}</p>
           {players.map(p => (
             <div key={p.id} className="flex items-center gap-2 text-xs">
               <span className="w-16 truncate text-text-muted">{p.name}</span>
@@ -121,37 +164,55 @@ export default function ImaginariumGame() {
                 <div className="h-full bg-accent rounded-full transition-all duration-500"
                   style={{ width: `${Math.min(100, (p.score / targetScore) * 100)}%` }} />
               </div>
-              <span className="w-8 text-right font-mono text-text-muted">{p.score}</span>
+              <span className="w-12 text-right font-mono text-text-muted">{p.score}/{targetScore}</span>
             </div>
           ))}
         </div>
 
-        <button onClick={nextRound} className="btn-primary w-full">
-          {lang === 'ru' ? 'Следующий раунд' : 'Next Round'}
+        <button onClick={nextRound}
+          className="btn-primary w-full active:scale-[0.98] transition-transform touch-manipulation">
+          <SkipForward size={18} /> {L('Следующий раунд', 'Next Round')}
         </button>
       </div>
     )
   }
 
+  // ═══════════════════════════════════════════
+  // END
+  // ═══════════════════════════════════════════
   if (phase === 'end') {
     const sorted = [...players].sort((a, b) => b.score - a.score)
     return (
       <div className="space-y-6 text-center">
+        <span className="game-phase-indicator mx-auto">
+          {L('Игра окончена', 'Game Over')}
+        </span>
+
         <h2 className="text-3xl font-bold">{t.game.congratulations}</h2>
+
         <div className="card p-8">
           <Trophy size={40} className="mx-auto text-accent mb-4" />
           <p className="text-2xl font-bold text-accent">{sorted[0].name}</p>
           <p className="text-text-muted">{sorted[0].score} {t.game.points}</p>
         </div>
+
         <div className="card p-4 space-y-2">
           {sorted.map((p, i) => (
             <div key={p.id} className="flex items-center justify-between text-sm">
-              <span className={i === 0 ? 'text-accent' : ''}>{i + 1}. {p.name}</span>
+              <span className={clsx(i === 0 && 'text-accent font-medium')}>
+                {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`} {p.name}
+              </span>
               <span className="font-mono">{p.score}</span>
             </div>
           ))}
         </div>
-        <button onClick={resetGame} className="btn-primary w-full">
+
+        <div className="text-xs text-text-muted">
+          {L(`Раундов сыграно: ${round}`, `Rounds played: ${round}`)}
+        </div>
+
+        <button onClick={resetGame}
+          className="btn-primary w-full active:scale-[0.98] transition-transform touch-manipulation">
           <RotateCcw size={18} /> {t.game.play_again}
         </button>
       </div>
