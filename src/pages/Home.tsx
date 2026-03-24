@@ -40,12 +40,27 @@ export default function Home() {
       <header className="fixed top-0 inset-x-0 z-50 bg-bg/60 glass">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           <span className="text-accent font-display text-xl font-bold tracking-wide">GameStol</span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {/* Desktop nav links */}
+            <nav className="hidden sm:flex items-center gap-1 mr-2">
+              <Link to="/catalog" className="btn-ghost text-sm">{t.nav.catalog}</Link>
+              <Link to="/contribute" className="btn-ghost text-sm">{L('Добавить игру', 'Add a Game')}</Link>
+              <a href="https://github.com/egorfedorov/gamestol" target="_blank" rel="noopener"
+                className="btn-ghost text-sm gap-1.5">
+                <Star size={13} className="text-amber-400" />
+                GitHub
+              </a>
+            </nav>
+
+            {/* Divider */}
+            <div className="hidden sm:block w-px h-5 bg-border mx-1" />
+
+            {/* Language */}
             <div className="relative">
               <button onClick={() => setLangOpen(!langOpen)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-text-secondary hover:text-text transition-colors">
-                <Globe size={14} />
-                <span className="hidden sm:inline">{LANGUAGES.find(l => l.code === lang)?.flag} {LANGUAGES.find(l => l.code === lang)?.name}</span>
+                className="btn-ghost text-sm gap-1.5">
+                <span>{LANGUAGES.find(l => l.code === lang)?.flag}</span>
+                <span className="hidden sm:inline">{LANGUAGES.find(l => l.code === lang)?.name}</span>
               </button>
               {langOpen && (
                 <>
@@ -65,17 +80,6 @@ export default function Home() {
                 </>
               )}
             </div>
-            <a href="https://github.com/egorfedorov/gamestol" target="_blank" rel="noopener"
-              className="flex items-center gap-1.5 text-text-secondary hover:text-amber-400 text-sm transition-colors hidden sm:inline-flex">
-              <Star size={14} className="text-amber-400" />
-              Star
-            </a>
-            <Link to="/contribute" className="text-text-secondary hover:text-accent text-sm transition-colors hidden sm:inline">
-              {L('Добавить игру', 'Add a Game')}
-            </Link>
-            <Link to="/catalog" className="btn-primary text-sm py-2 px-4">
-              {t.landing.hero_cta}
-            </Link>
           </div>
         </div>
       </header>
