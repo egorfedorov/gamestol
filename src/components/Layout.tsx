@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
-import { Home, Grid3X3, ChevronLeft, Globe } from 'lucide-react'
+import { Home, Grid3X3, ChevronLeft, Globe, Star } from 'lucide-react'
 import { useState } from 'react'
 import { useI18n, LANGUAGES, LangCode } from '../i18n'
 import clsx from 'clsx'
@@ -26,6 +26,11 @@ export default function Layout() {
               <NavLink to="/catalog" className={({ isActive }) =>
                 clsx('btn-ghost text-sm', isActive && 'text-text bg-bg-hover')
               }>{t.nav.catalog}</NavLink>
+              <a href="https://github.com/egorfedorov/gamestol" target="_blank" rel="noopener"
+                className="btn-ghost text-sm gap-1 text-text-muted hover:text-amber-400">
+                <Star size={14} className="text-amber-400" />
+                GitHub
+              </a>
             </nav>
             <div className="relative">
               <button onClick={() => setLangOpen(!langOpen)} className="btn-ghost text-sm gap-1.5">

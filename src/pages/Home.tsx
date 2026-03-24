@@ -65,6 +65,11 @@ export default function Home() {
                 </>
               )}
             </div>
+            <a href="https://github.com/egorfedorov/gamestol" target="_blank" rel="noopener"
+              className="flex items-center gap-1.5 text-text-secondary hover:text-amber-400 text-sm transition-colors hidden sm:inline-flex">
+              <Star size={14} className="text-amber-400" />
+              Star
+            </a>
             <Link to="/contribute" className="text-text-secondary hover:text-accent text-sm transition-colors hidden sm:inline">
               {L('Добавить игру', 'Add a Game')}
             </Link>
@@ -108,6 +113,16 @@ export default function Home() {
                 <ChevronDown size={18} />
               </button>
             </div>
+
+            {/* GitHub star under hero */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
+              className="mt-8">
+              <a href="https://github.com/egorfedorov/gamestol" target="_blank" rel="noopener"
+                className="inline-flex items-center gap-2 text-text-muted hover:text-amber-400 text-sm transition-colors">
+                <Star size={14} className="text-amber-400" />
+                {L('Поставьте звезду на GitHub', 'Star us on GitHub')}
+              </a>
+            </motion.div>
           </motion.div>
 
           {/* Floating game emojis — edges only, no overlap with text */}
@@ -518,6 +533,11 @@ export default function Home() {
                 {L('Мобильный', 'Mobile')}
               </span>
             </div>
+            <a href="https://github.com/egorfedorov/gamestol" target="_blank" rel="noopener"
+              className="inline-flex items-center gap-2 mt-6 text-text-muted hover:text-amber-400 text-sm transition-colors">
+              <Star size={14} className="text-amber-400" />
+              {L('Поддержите проект — поставьте звезду на GitHub', 'Support us — star on GitHub')}
+            </a>
           </motion.div>
         </div>
       </section>
@@ -525,32 +545,47 @@ export default function Home() {
       {/* ═══════════════════════════════════════════ */}
       {/* OPEN SOURCE — star CTA */}
       {/* ═══════════════════════════════════════════ */}
-      <section className="py-16 sm:py-20 border-t border-border/50">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+      <section className="py-24 sm:py-32 border-t border-border/50 relative">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(251,191,36,0.04)_0%,transparent_60%)]" />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
           <motion.div {...fadeUp}>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-bg-surface border border-border mb-6">
-              <Star size={16} className="text-amber-400" />
-              <span className="text-sm text-text-secondary">Open Source</span>
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-amber-400/10 border border-amber-400/20 mb-8">
+              <Star size={18} className="text-amber-400" />
+              <span className="text-sm font-medium text-amber-400">Open Source</span>
             </div>
-            <h3 className="text-2xl font-bold mb-3">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
               {L('Поставьте звезду на GitHub', 'Star us on GitHub')}
-            </h3>
-            <p className="text-text-muted text-sm mb-6 max-w-md mx-auto">
+            </h2>
+            <p className="text-text-secondary text-lg mb-8 max-w-xl mx-auto">
               {L(
-                'GameStol — проект с открытым кодом. Звезда помогает другим найти проект.',
-                'GameStol is open source. A star helps others discover the project.'
+                'GameStol — проект с открытым кодом. Звезда помогает другим найти проект и мотивирует делать его лучше.',
+                'GameStol is open source. Stars help others find the project and motivate us to keep improving.'
               )}
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a href="https://github.com/egorfedorov/gamestol" target="_blank" rel="noopener"
-                className="btn-secondary px-6 py-3 gap-2">
-                <Star size={16} className="text-amber-400" />
+                className="btn-primary text-lg px-10 py-5 shadow-lg shadow-amber-400/10 bg-amber-500 hover:bg-amber-400">
+                <Star size={20} />
                 {L('Поставить звезду', 'Star on GitHub')}
               </a>
-              <Link to="/contribute" className="btn-ghost text-sm">
-                <Plus size={16} />
-                {L('Добавить игру', 'Add a Game')}
+              <Link to="/contribute" className="btn-secondary px-8 py-4">
+                <Plus size={18} />
+                {L('Добавить свою игру', 'Add your own game')}
               </Link>
+            </div>
+            <div className="flex items-center justify-center gap-8 mt-10 text-text-muted text-sm">
+              <div className="flex items-center gap-2">
+                <Gamepad2 size={16} className="text-accent" />
+                <span>10 {L('игр', 'games')}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Globe size={16} className="text-accent" />
+                <span>12 {L('языков', 'languages')}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Users size={16} className="text-accent" />
+                <span>{L('Открытый код', 'Open source')}</span>
+              </div>
             </div>
           </motion.div>
         </div>
