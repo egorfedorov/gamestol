@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-bg text-text;
+    overscroll-behavior: none;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-border-light;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-bg-card border border-border rounded-2xl;
+  }
+
+  .card-hover {
+    @apply card transition-all duration-200 hover:border-border-light hover:bg-bg-hover;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-accent text-bg font-semibold rounded-xl
+           transition-all duration-200 hover:bg-accent-light active:scale-[0.97];
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 border border-border text-text rounded-xl
+           transition-all duration-200 hover:border-border-light hover:bg-bg-hover active:scale-[0.97];
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-text-secondary rounded-lg
+           transition-all duration-200 hover:text-text hover:bg-bg-hover active:scale-[0.97];
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-white font-semibold rounded-xl
+           transition-all duration-200 hover:bg-red-500 active:scale-[0.97];
+  }
+
+  .input {
+    @apply w-full px-4 py-3 bg-bg-surface border border-border rounded-xl text-text placeholder-text-muted
+           focus:outline-none focus:border-accent/50 transition-colors;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full;
+  }
+
+  .section-title {
+    @apply text-2xl md:text-3xl font-bold tracking-tight;
+  }
+
+  .game-phase-indicator {
+    @apply flex items-center gap-2 px-4 py-2 bg-accent-muted border border-accent/20 rounded-full text-accent text-sm font-medium;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .glass {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
