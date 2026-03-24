@@ -44,15 +44,32 @@ export default function MafiaGame() {
   const mafiaAlive = alive.filter(p => p.role === 'mafia')
   const citizensAlive = alive.filter(p => p.role !== 'mafia')
 
-  // Role assignment helpers
+  // Role limits based on player count (official Mafia rules)
   const assigned = Object.values(roleAssignments)
   const mafiaCount = assigned.filter(r => r === 'mafia').length
   const doctorCount = assigned.filter(r => r === 'doctor').length
   const detectiveCount = assigned.filter(r => r === 'detective').length
   const citizenCount = assigned.filter(r => r === 'citizen').length
-  const suggestedMafia = players.length <= 7 ? 1 : players.length <= 11 ? 2 : 3
 
-  const canStart = mafiaCount >= 1 && players.every(p => roleAssignments[p.id])
+  // Max mafia: must always be fewer than civilians (mafia < non-mafia)
+  // Standard: 6-7 → 1, 8-11 → 2, 12-15 → 3, 16+ → 4
+  const maxMafia = players.length <= 7 ? 1 : players.length <= 11 ? 2 : players.length <= 15 ? 3 : 4
+  const maxDoctor = 1
+  const maxDetective = 1
+
+  // Check if a role can be assigned to a player
+  const canAssignRole = (playerId: string, role: Role): boolean => {
+    const currentRole = roleAssignments[playerId]
+    if (currentRole === role) return true // already has this role
+    if (role === 'mafia') return mafiaCount < maxMafia
+    if (role === 'doctor') return doctorCount < maxDoctor
+    if (role === 'detective') return detectiveCount < maxDetective
+    return true // citizen always allowed
+  }
+
+  const canStart = mafiaCount >= 1 && mafiaCount <= maxMafia
+    && doctorCount <= maxDoctor && detectiveCount <= maxDetective
+    && players.every(p => roleAssignments[p.id])
 
   // ───── Actions ─────
 
@@ -224,24 +241,32 @@ export default function MafiaGame() {
       <div className="space-y-6">
         <h2 className="text-xl font-bold">{L('Назначение ролей', 'Role Assignment')}</h2>
 
-        <p className="text-text-secondary text-sm">
-          {L(
-            `Выберите роль для каждого. Рекомендация: мафия — ${suggestedMafia}, доктор — 1, комиссар — 1, остальные — мирные.`,
-            `Choose a role for each. Recommended: mafia — ${suggestedMafia}, doctor — 1, detective — 1, rest — citizens.`
-          )}
-        </p>
+        {/* Role limits info */}
+        <div className="card p-4 text-sm text-text-secondary">
+          <p className="font-medium text-text mb-2">
+            {L(`Правила для ${players.length} игроков:`, `Rules for ${players.length} players:`)}
+          </p>
+          <p>• {L('Мафия', 'Mafia')}: {L('максимум', 'max')} <span className="text-red-400 font-mono">{maxMafia}</span></p>
+          <p>• {L('Доктор', 'Doctor')}: {L('максимум', 'max')} <span className="text-emerald-400 font-mono">{maxDoctor}</span></p>
+          <p>• {L('Комиссар', 'Detective')}: {L('максимум', 'max')} <span className="text-amber-400 font-mono">{maxDetective}</span></p>
+          <p>• {L('Мирные', 'Citizens')}: {L('остальные', 'the rest')} <span className="text-blue-400 font-mono">({players.length - maxMafia - maxDoctor - maxDetective}+)</span></p>
+        </div>
 
-        {/* Role counters */}
+        {/* Role counters with limits */}
         <div className="grid grid-cols-4 gap-2">
           {allRoles.map(role => {
             const rc = roleConfig[role]
             const Icon = rc.icon
             const count = assigned.filter(r => r === role).length
+            const max = role === 'mafia' ? maxMafia : role === 'doctor' ? maxDoctor : role === 'detective' ? maxDetective : players.length
+            const isFull = role !== 'citizen' && count >= max
             return (
-              <div key={role} className="card p-2.5 text-center">
+              <div key={role} className={clsx('card p-2.5 text-center', isFull && 'border-border-light')}>
                 <Icon size={16} className={clsx('mx-auto mb-1', rc.color)} />
                 <p className="text-[10px] text-text-muted">{L(rc.label, rc.labelEn)}</p>
-                <p className={clsx('text-lg font-mono font-bold', rc.color)}>{count}</p>
+                <p className={clsx('text-lg font-mono font-bold', rc.color)}>
+                  {count}{role !== 'citizen' && <span className="text-text-muted text-xs">/{max}</span>}
+                </p>
               </div>
             )
           })}
@@ -259,14 +284,18 @@ export default function MafiaGame() {
                     const rc = roleConfig[role]
                     const Icon = rc.icon
                     const isSelected = currentRole === role
+                    const isAllowed = canAssignRole(p.id, role)
                     return (
                       <button key={role}
-                        onClick={() => setRoleAssignments(prev => ({ ...prev, [p.id]: role }))}
+                        disabled={!isAllowed}
+                        onClick={() => isAllowed && setRoleAssignments(prev => ({ ...prev, [p.id]: role }))}
                         className={clsx(
-                          'flex flex-col items-center gap-1 py-2 rounded-lg text-[10px] font-medium transition-all active:scale-95',
+                          'flex flex-col items-center gap-1 py-2 rounded-lg text-[10px] font-medium transition-all',
                           isSelected
                             ? rc.color
-                            : 'text-text-muted hover:bg-bg-hover'
+                            : isAllowed
+                              ? 'text-text-muted hover:bg-bg-hover active:scale-95'
+                              : 'text-text-muted/30 cursor-not-allowed'
                         )}
                         style={isSelected ? { backgroundColor: rc.bg, borderColor: rc.bg } : undefined}>
                         <Icon size={14} />
@@ -280,10 +309,14 @@ export default function MafiaGame() {
           })}
         </div>
 
-        {mafiaCount === 0 && (
-          <div className="flex items-center gap-2 text-red-400 text-xs">
+        {!canStart && (
+          <div className="flex items-center gap-2 text-amber-400 text-xs">
             <AlertCircle size={14} />
-            {L('Назначьте хотя бы одного мафиози', 'Assign at least one mafia member')}
+            {mafiaCount === 0
+              ? L('Назначьте хотя бы одного мафиози', 'Assign at least one mafia member')
+              : mafiaCount > maxMafia
+                ? L(`Максимум ${maxMafia} мафии для ${players.length} игроков`, `Max ${maxMafia} mafia for ${players.length} players`)
+                : L('Назначьте роли всем игрокам', 'Assign roles to all players')}
           </div>
         )}
 
