@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react'
-import { Plus, Minus, Play, RotateCcw, Volume2, VolumeX } from 'lucide-react'
+import { useState, useMemo, useCallback } from 'react'
+import { Plus, Minus, Play, RotateCcw, Users, AlertTriangle } from 'lucide-react'
 import { useI18n } from '../i18n'
 import { useTimer } from '../hooks/useTimer'
 import { aliasWords, aliasWordsEn } from '../data/words'
@@ -21,6 +21,7 @@ export default function AliasGame() {
     { name: L('Команда 1', 'Team 1'), score: 0 },
     { name: L('Команда 2', 'Team 2'), score: 0 },
   ])
+  const [playersPerTeam, setPlayersPerTeam] = useState<number[]>([2, 2])
   const [currentTeam, setCurrentTeam] = useState(0)
   const [targetScore, setTargetScore] = useState(50)
   const [timerSeconds, setTimerSeconds] = useState(60)
@@ -28,6 +29,14 @@ export default function AliasGame() {
   const [currentWord, setCurrentWord] = useState('')
   const [wordsUsed, setWordsUsed] = useState<Set<string>>(new Set())
   const [round, setRound] = useState(1)
+
+  const totalPlayers = useMemo(() => playersPerTeam.reduce((a, b) => a + b, 0), [playersPerTeam])
+
+  const suggestTargetScore = useCallback((teamCount: number) => {
+    if (teamCount <= 2) return 50
+    if (teamCount === 3) return 60
+    return 70
+  }, [])
 
   const words = useMemo(() => {
     const source = lang === 'ru' ? aliasWords : aliasWordsEn
@@ -97,13 +106,40 @@ export default function AliasGame() {
     timer.reset(timerSeconds)
   }
 
+  const addTeam = () => {
+    const newTeams = [...teams, { name: `${L('Команда', 'Team')} ${teams.length + 1}`, score: 0 }]
+    setTeams(newTeams)
+    setPlayersPerTeam(prev => [...prev, 2])
+    setTargetScore(suggestTargetScore(newTeams.length))
+  }
+
+  const removeTeam = (index: number) => {
+    setTeams(prev => prev.filter((_, idx) => idx !== index))
+    setPlayersPerTeam(prev => prev.filter((_, idx) => idx !== index))
+    if (currentTeam >= teams.length - 1) setCurrentTeam(0)
+    const newCount = teams.length - 1
+    setTargetScore(suggestTargetScore(newCount))
+  }
+
+  const updatePlayersPerTeam = (index: number, delta: number) => {
+    setPlayersPerTeam(prev => prev.map((count, i) =>
+      i === index ? Math.max(1, Math.min(10, count + delta)) : count
+    ))
+  }
+
+  const getRecommendedTimer = () => {
+    if (totalPlayers <= 4) return 45
+    if (totalPlayers <= 8) return 60
+    return 90
+  }
+
   // ═══════════════════════════════════════════
   // SETUP
   // ═══════════════════════════════════════════
   if (phase === 'setup') {
     return (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold">💬 {L('Алиас', 'Alias')}</h2>
+        <h2 className="text-2xl font-bold">{L('Алиас', 'Alias')}</h2>
 
         <div className="card p-4 text-sm text-text-secondary space-y-1">
           <p className="font-medium text-text mb-2">{L('Как играть:', 'How to play:')}</p>
@@ -113,28 +149,79 @@ export default function AliasGame() {
           <p>4. {L('Угадали: +1, пропуск: −1', 'Correct: +1, skip: −1')}</p>
         </div>
 
+        {/* Low player warning */}
+        {totalPlayers < 4 && (
+          <div className="card p-3 border-amber-500/30 bg-amber-500/5 flex items-start gap-2 text-sm">
+            <AlertTriangle size={18} className="text-amber-400 shrink-0 mt-0.5" />
+            <p className="text-amber-300">
+              {L(
+                'Рекомендуется минимум 4 игрока (по 2 в команде). Сейчас: ' + totalPlayers,
+                'At least 4 players recommended (2 per team). Currently: ' + totalPlayers
+              )}
+            </p>
+          </div>
+        )}
+
         {/* Teams */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm text-text-secondary">{t.game.teams}</span>
             {teams.length < 6 && (
-              <button onClick={() => setTeams([...teams, { name: `${L('Команда', 'Team')} ${teams.length + 1}`, score: 0 }])}
-                className="btn-ghost text-xs">
+              <button onClick={addTeam} className="btn-ghost text-xs">
                 <Plus size={14} /> {t.game.add_team}
               </button>
             )}
           </div>
           {teams.map((team, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <input type="text" value={team.name}
-                onChange={e => setTeams(prev => prev.map((t, idx) => idx === i ? { ...t, name: e.target.value } : t))}
-                className="input flex-1 text-sm" />
-              {teams.length > 2 && (
-                <button onClick={() => { setTeams(prev => prev.filter((_, idx) => idx !== i)); if (currentTeam >= teams.length - 1) setCurrentTeam(0) }}
-                  className="btn-ghost text-red-400 p-2 text-lg">×</button>
-              )}
+            <div key={i} className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <input type="text" value={team.name}
+                  onChange={e => setTeams(prev => prev.map((t, idx) => idx === i ? { ...t, name: e.target.value } : t))}
+                  className="input flex-1 text-sm" />
+                {teams.length > 2 && (
+                  <button onClick={() => removeTeam(i)}
+                    className="btn-ghost text-red-400 p-2 text-lg">&times;</button>
+                )}
+              </div>
+              {/* Players per team */}
+              <div className="flex items-center gap-2 ml-1 text-xs text-text-muted">
+                <Users size={12} />
+                <span>{L('Игроков:', 'Players:')}</span>
+                <button onClick={() => updatePlayersPerTeam(i, -1)}
+                  className="w-5 h-5 rounded bg-bg-surface flex items-center justify-center hover:bg-border transition-colors">
+                  <Minus size={10} />
+                </button>
+                <span className="font-mono w-4 text-center text-text">{playersPerTeam[i]}</span>
+                <button onClick={() => updatePlayersPerTeam(i, 1)}
+                  className="w-5 h-5 rounded bg-bg-surface flex items-center justify-center hover:bg-border transition-colors">
+                  <Plus size={10} />
+                </button>
+              </div>
             </div>
           ))}
+          {/* Total players */}
+          <div className="flex items-center justify-end gap-1.5 text-xs text-text-muted pt-1">
+            <Users size={12} />
+            <span>{L('Всего игроков:', 'Total players:')} <span className="font-mono text-text">{totalPlayers}</span></span>
+          </div>
+        </div>
+
+        {/* Recommended settings */}
+        <div className="card p-3 bg-accent/5 border-accent/20 space-y-1.5 text-sm">
+          <p className="font-medium text-accent text-xs uppercase tracking-wider">
+            {L('Рекомендуемые настройки', 'Recommended settings')}
+          </p>
+          <p className="text-text-secondary">
+            {L('Цель', 'Target')}: <span className="text-text font-mono">{suggestTargetScore(teams.length)}</span> {t.game.points}
+            {' · '}
+            {L('Таймер', 'Timer')}: <span className="text-text font-mono">{getRecommendedTimer()}</span> {L('сек', 'sec')}
+          </p>
+          <p className="text-text-muted text-xs">
+            {L(
+              teams.length + ' команд, ' + totalPlayers + ' игроков',
+              teams.length + ' teams, ' + totalPlayers + ' players'
+            )}
+          </p>
         </div>
 
         {/* Settings */}
@@ -201,9 +288,9 @@ export default function AliasGame() {
 
         <div className="card p-4 text-sm text-text-muted space-y-1">
           <p>{L('Напоминание:', 'Reminder:')}</p>
-          <p>• {L('Нельзя использовать однокоренные слова', 'No root words allowed')}</p>
-          <p>• {L('Нельзя показывать жестами', 'No gestures allowed')}</p>
-          <p>• {L('Если сложно — лучше пропустить', 'If it\'s hard — better skip')}</p>
+          <p>&bull; {L('Нельзя использовать однокоренные слова', 'No root words allowed')}</p>
+          <p>&bull; {L('Нельзя показывать жестами', 'No gestures allowed')}</p>
+          <p>&bull; {L('Если сложно — лучше пропустить', 'If it\'s hard — better skip')}</p>
         </div>
 
         <button onClick={startTurn} className="btn-primary w-full text-lg py-4">

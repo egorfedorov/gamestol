@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Shuffle, Eye, Vote, RotateCcw, Skull, Smartphone, Users } from 'lucide-react'
+import { Shuffle, Eye, Vote, RotateCcw, Skull, Smartphone, Users, Shield } from 'lucide-react'
 import { useI18n } from '../i18n'
 import PlayerSetup from '../components/PlayerSetup'
 import { Player } from '../types'
@@ -109,6 +109,10 @@ export default function BunkerGame() {
   const alive = gamePlayers.filter(p => p.isAlive)
   const labels = lang === 'ru' ? traitLabels.ru : traitLabels.en
 
+  // Computed for setup display
+  const setupSlots = Math.max(2, Math.floor(players.length / 2))
+  const setupEliminate = players.length - setupSlots
+
   // ═══════════════════════════════════════════
   // SETUP — add players + instructions
   // ═══════════════════════════════════════════
@@ -149,15 +153,37 @@ export default function BunkerGame() {
 
         <PlayerSetup players={players} onChange={setPlayers} min={4} max={16} />
 
+        {/* Bunker capacity display */}
         {players.length >= 4 && (
-          <div className="card p-4 text-sm text-text-secondary space-y-1">
-            <div className="flex items-center justify-between">
-              <span>{L('Мест в бункере:', 'Bunker slots:')}</span>
-              <span className="font-mono font-bold text-emerald-400">{Math.max(2, Math.floor(players.length / 2))}</span>
+          <div className="card p-4 space-y-3">
+            {/* Main bunker info */}
+            <div className="flex items-center gap-3">
+              <Shield size={20} className="text-emerald-400 shrink-0" />
+              <p className="text-sm font-medium">
+                {L(
+                  `Бункер вмещает ${setupSlots} из ${players.length} игроков. Нужно исключить ${setupEliminate}.`,
+                  `Bunker fits ${setupSlots} of ${players.length} players. Need to eliminate ${setupEliminate}.`
+                )}
+              </p>
             </div>
-            <div className="flex items-center justify-between">
-              <span>{L('Нужно исключить:', 'Must eliminate:')}</span>
-              <span className="font-mono font-bold text-red-400">{players.length - Math.max(2, Math.floor(players.length / 2))}</span>
+            {/* Visual bar */}
+            <div className="flex gap-1">
+              {Array.from({ length: players.length }).map((_, i) => (
+                <div key={i} className={clsx(
+                  'h-2 flex-1 rounded-full',
+                  i < setupSlots ? 'bg-emerald-500/60' : 'bg-red-500/40'
+                )} />
+              ))}
+            </div>
+            <div className="flex items-center justify-between text-xs text-text-muted">
+              <span className="flex items-center gap-1">
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500/60" />
+                {L('Выживают', 'Survive')}: <span className="font-mono text-emerald-400">{setupSlots}</span>
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="inline-block w-2 h-2 rounded-full bg-red-500/40" />
+                {L('Исключают', 'Eliminated')}: <span className="font-mono text-red-400">{setupEliminate}</span>
+              </span>
             </div>
           </div>
         )}

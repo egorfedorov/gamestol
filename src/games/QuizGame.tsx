@@ -108,9 +108,9 @@ export default function QuizGame() {
 
         <div className="card p-4 text-sm text-text-secondary space-y-1">
           <p className="font-medium text-text mb-2">{L('Правила:', 'Rules:')}</p>
-          <p>• {L('60 секунд на обсуждение каждого вопроса', '60 seconds to discuss each question')}</p>
-          <p>• {L('Один человек (капитан) даёт финальный ответ', 'One person (captain) gives the final answer')}</p>
-          <p>• {L('Нельзя гуглить!', 'No googling!')}</p>
+          <p>{L('60 секунд на обсуждение каждого вопроса', '60 seconds to discuss each question')}</p>
+          <p>{L('Один человек (капитан) даёт финальный ответ', 'One person (captain) gives the final answer')}</p>
+          <p>{L('Нельзя гуглить!', 'No googling!')}</p>
         </div>
 
         <button onClick={startGame} className="btn-primary w-full">

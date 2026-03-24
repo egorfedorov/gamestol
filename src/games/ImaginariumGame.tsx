@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Plus, Minus, RotateCcw, Trophy, SkipForward } from 'lucide-react'
 import { useI18n } from '../i18n'
 import PlayerSetup from '../components/PlayerSetup'
@@ -15,7 +15,18 @@ export default function ImaginariumGame() {
   const [players, setPlayers] = useState<Player[]>([])
   const [round, setRound] = useState(1)
   const [storytellerIndex, setStorytellerIndex] = useState(0)
-  const [targetScore, setTargetScore] = useState(30)
+  const [targetScore, setTargetScore] = useState(20)
+
+  const recommendedScore = useMemo(() => {
+    const count = players.length
+    if (count >= 7) return 30
+    if (count >= 5) return 25
+    return 20
+  }, [players.length])
+
+  useEffect(() => {
+    setTargetScore(recommendedScore)
+  }, [recommendedScore])
 
   const startGame = () => {
     setPhase('playing')
@@ -68,27 +79,36 @@ export default function ImaginariumGame() {
             '═══ Если ВСЕ или НИКТО не угадал карту рассказчика:',
             '═══ If ALL or NONE guessed the storyteller\'s card:'
           )}</p>
-          <p>{L('• Рассказчик: 0 очков', '• Storyteller: 0 points')}</p>
-          <p>{L('• Все остальные: +2 очка', '• Everyone else: +2 points')}</p>
+          <p>{L('Рассказчик: 0 очков', 'Storyteller: 0 points')}</p>
+          <p>{L('Все остальные: +2 очка', 'Everyone else: +2 points')}</p>
           <p className="text-text-muted mt-1">{L(
             '═══ Если угадали НЕКОТОРЫЕ:',
             '═══ If SOME guessed correctly:'
           )}</p>
-          <p>{L('• Рассказчик: +3 очка', '• Storyteller: +3 points')}</p>
-          <p>{L('• Каждый угадавший: +3 очка', '• Each correct guesser: +3 points')}</p>
+          <p>{L('Рассказчик: +3 очка', 'Storyteller: +3 points')}</p>
+          <p>{L('Каждый угадавший: +3 очка', 'Each correct guesser: +3 points')}</p>
           <p className="text-text-muted mt-1">{L(
             '═══ Бонус:',
             '═══ Bonus:'
           )}</p>
-          <p>{L('• За каждый голос за ВАШУ карту (не рассказчик): +1 очко', '• For each vote on YOUR card (non-storyteller): +1 point')}</p>
+          <p>{L('За каждый голос за ВАШУ карту (не рассказчик): +1 очко', 'For each vote on YOUR card (non-storyteller): +1 point')}</p>
         </div>
 
         <PlayerSetup players={players} onChange={setPlayers} min={3} max={8} />
 
         <div className="card p-4">
-          <label className="text-sm text-text-secondary block mb-2">
+          <label className="text-sm text-text-secondary block mb-1">
             {L('Цель', 'Target score')}: <span className="text-text font-mono">{targetScore}</span> {t.game.points}
           </label>
+          {targetScore === recommendedScore ? (
+            <p className="text-xs text-accent mb-2">
+              {L('Рекомендуемое значение', 'Recommended')}
+            </p>
+          ) : (
+            <p className="text-xs text-text-muted mb-2">
+              {L(`Рекомендуемое: ${recommendedScore}`, `Recommended: ${recommendedScore}`)}
+            </p>
+          )}
           <input type="range" min={15} max={50} step={5} value={targetScore}
             onChange={e => setTargetScore(Number(e.target.value))} className="w-full accent-accent" />
         </div>

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Play, SkipForward, Check, RotateCcw, Volume2, VolumeX, AlertCircle } from 'lucide-react'
 import { useI18n } from '../i18n'
 import { useTimer } from '../hooks/useTimer'
@@ -21,6 +21,17 @@ export default function CrocodileGame() {
   const [targetScore, setTargetScore] = useState(10)
   const [timerSeconds, setTimerSeconds] = useState(60)
   const timer = useTimer(timerSeconds)
+
+  const recommendedScore = useMemo(() => {
+    const count = players.length
+    if (count >= 11) return 20
+    if (count >= 6) return 15
+    return 10
+  }, [players.length])
+
+  useEffect(() => {
+    setTargetScore(recommendedScore)
+  }, [recommendedScore])
 
   const words = useMemo(() => [...crocodileWords].sort(() => Math.random() - 0.5), [])
 
@@ -87,7 +98,7 @@ export default function CrocodileGame() {
   if (phase === 'setup') {
     return (
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold">🐊 {L('Крокодил', 'Charades')}</h2>
+        <h2 className="text-2xl font-bold">{L('Крокодил', 'Charades')}</h2>
 
         <div className="card p-4 text-sm text-text-secondary space-y-1">
           <p className="font-medium text-text mb-2">{L('Как играть:', 'How to play:')}</p>
@@ -101,9 +112,18 @@ export default function CrocodileGame() {
 
         <div className="card p-4 space-y-4">
           <div>
-            <label className="text-sm text-text-secondary block mb-2">
+            <label className="text-sm text-text-secondary block mb-1">
               {L('Цель', 'Target')}: <span className="text-text font-mono">{targetScore}</span> {t.game.points}
             </label>
+            {targetScore === recommendedScore ? (
+              <p className="text-xs text-accent mb-2">
+                {L('Рекомендуемое значение', 'Recommended')}
+              </p>
+            ) : (
+              <p className="text-xs text-text-muted mb-2">
+                {L(`Рекомендуемое: ${recommendedScore}`, `Recommended: ${recommendedScore}`)}
+              </p>
+            )}
             <input type="range" min={5} max={20} value={targetScore}
               onChange={e => setTargetScore(Number(e.target.value))}
               className="w-full accent-accent" />

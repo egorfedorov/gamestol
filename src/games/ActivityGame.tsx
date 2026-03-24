@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Play, Check, SkipForward, RotateCcw, Pencil, MessageSquare, User, AlertCircle } from 'lucide-react'
+import { Plus, Play, Check, SkipForward, RotateCcw, Pencil, MessageSquare, User, AlertCircle } from 'lucide-react'
 import { useI18n } from '../i18n'
 import { useTimer } from '../hooks/useTimer'
 import { activityWords } from '../data/words'
@@ -34,6 +34,12 @@ const modeConfig: Record<Mode, { icon: any; label: { ru: string; en: string }; c
   },
 }
 
+const suggestedScore = (count: number) => {
+  if (count <= 2) return 30
+  if (count === 3) return 40
+  return 50
+}
+
 export default function ActivityGame() {
   const { t, lang } = useI18n()
   const L = (ru: string, en: string) => lang === 'ru' ? ru : en
@@ -58,6 +64,21 @@ export default function ActivityGame() {
   const getRandomWord = (mode: Mode): string => {
     const words = activityWords[mode]
     return words[Math.floor(Math.random() * words.length)]
+  }
+
+  const addTeam = () => {
+    if (teams.length >= 4) return
+    const newCount = teams.length + 1
+    setTeams([...teams, { name: `${L('Команда', 'Team')} ${newCount}`, score: 0 }])
+    setTargetScore(suggestedScore(newCount))
+  }
+
+  const removeTeam = (index: number) => {
+    if (teams.length <= 2) return
+    const newTeams = teams.filter((_, i) => i !== index)
+    setTeams(newTeams)
+    if (currentTeam >= newTeams.length) setCurrentTeam(0)
+    setTargetScore(suggestedScore(newTeams.length))
   }
 
   const drawCard = () => {
@@ -127,13 +148,28 @@ export default function ActivityGame() {
           <p className="pt-1 text-text-muted">{L('Режим выбирается случайно каждый ход', 'Mode is chosen randomly each turn')}</p>
         </div>
 
-        <div className="space-y-2">
+        {/* Teams */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-text-secondary">
+              {t.game.teams} ({teams.length})
+            </span>
+            {teams.length < 4 && (
+              <button onClick={addTeam} className="btn-ghost text-xs">
+                <Plus size={14} /> {t.game.add_team}
+              </button>
+            )}
+          </div>
           {teams.map((team, i) => (
             <div key={i} className="flex items-center gap-2">
               <input type="text" value={team.name}
                 onChange={e => setTeams(prev => prev.map((t, idx) => idx === i ? { ...t, name: e.target.value } : t))}
                 className="input flex-1 text-sm" />
               <span className="font-mono text-sm w-12 text-right">{team.score}/{targetScore}</span>
+              {teams.length > 2 && (
+                <button onClick={() => removeTeam(i)}
+                  className="btn-ghost text-red-400 p-2 text-lg">×</button>
+              )}
             </div>
           ))}
         </div>
@@ -148,7 +184,7 @@ export default function ActivityGame() {
         </div>
 
         <div className="card p-4 text-center">
-          <p className="text-text-muted text-sm mb-1">{L('Ход команды', 'Turn')}</p>
+          <p className="text-text-muted text-sm mb-1">{L('Ход команды', 'Team turn')}</p>
           <p className="text-lg font-semibold text-accent">{teams[currentTeam].name}</p>
         </div>
 
@@ -186,7 +222,7 @@ export default function ActivityGame() {
 
         <div className="card p-8 space-y-4">
           <p className="text-text-muted text-sm">
-            {L('Команда', 'Team')}: <span className="text-accent font-medium">{teams[currentTeam].name}</span>
+            {t.game.team}: <span className="text-accent font-medium">{teams[currentTeam].name}</span>
           </p>
           <p className="text-sm text-text-secondary mb-2">{L('Ваше слово:', 'Your word:')}</p>
           <p className="text-3xl sm:text-4xl font-bold">{currentWord}</p>

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Plus, Play, Check, SkipForward, RotateCcw, Users, Hash } from 'lucide-react'
+import { Plus, Play, Check, SkipForward, RotateCcw, Users, Hash, AlertTriangle } from 'lucide-react'
 import { useI18n } from '../i18n'
 import { useTimer } from '../hooks/useTimer'
 import { hatWords } from '../data/words'
@@ -36,6 +36,16 @@ export default function HatGame() {
   const timer = useTimer(turnSeconds)
 
   // ═══════════════════════════════════════════
+  // COMPUTED
+  // ═══════════════════════════════════════════
+
+  const recommendedWords = playerNames.length <= 6
+    ? playerNames.length * 5
+    : playerNames.length * 6
+
+  const isOddPlayers = playerNames.length >= 4 && playerNames.length % 2 !== 0
+
+  // ═══════════════════════════════════════════
   // ACTIONS
   // ═══════════════════════════════════════════
 
@@ -58,7 +68,7 @@ export default function HatGame() {
   const startGame = () => {
     let words: string[]
     if (usePreset) {
-      words = [...hatWords].sort(() => Math.random() - 0.5).slice(0, playerNames.length * 5)
+      words = [...hatWords].sort(() => Math.random() - 0.5).slice(0, recommendedWords)
     } else {
       words = [...wordPool]
     }
@@ -178,6 +188,19 @@ export default function HatGame() {
               </span>
             ))}
           </div>
+
+          {/* Odd player count warning */}
+          {isOddPlayers && (
+            <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <AlertTriangle size={14} className="text-amber-400 mt-0.5 shrink-0" />
+              <p className="text-xs text-amber-400">
+                {L(
+                  'Нечётное число игроков — один игрок будет пропускать один раунд',
+                  'Odd player count — one player will sit out one round'
+                )}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Words mode */}
@@ -189,11 +212,19 @@ export default function HatGame() {
               {L('Использовать готовые слова', 'Use preset words')}
             </span>
           </label>
-          {usePreset && (
+          {usePreset && playerNames.length >= 2 && (
             <p className="text-xs text-text-muted">
               {L(
-                `Будет выбрано ${playerNames.length * 5 || '—'} случайных слов из набора`,
-                `${playerNames.length * 5 || '—'} random words will be selected`
+                `Рекомендуется: ${recommendedWords} слов (будут выбраны случайно из набора)`,
+                `Recommended: ${recommendedWords} words (randomly selected from preset)`
+              )}
+            </p>
+          )}
+          {usePreset && playerNames.length < 2 && (
+            <p className="text-xs text-text-muted">
+              {L(
+                'Добавьте игроков, чтобы увидеть рекомендуемое количество слов',
+                'Add players to see the recommended word count'
               )}
             </p>
           )}
@@ -209,6 +240,11 @@ export default function HatGame() {
                 {wordPool.length < 10 && (
                   <span className="text-amber-400 ml-2">
                     {L(`(нужно минимум 10)`, `(need at least 10)`)}
+                  </span>
+                )}
+                {playerNames.length >= 2 && wordPool.length >= 10 && (
+                  <span className="text-text-muted ml-2">
+                    ({L(`рекомендуется: ${recommendedWords}`, `recommended: ${recommendedWords}`)})
                   </span>
                 )}
               </p>
@@ -295,9 +331,9 @@ export default function HatGame() {
         {/* Rules reminder */}
         <div className="card p-4 text-sm text-text-muted space-y-1">
           <p>{L('Напоминание:', 'Reminder:')}</p>
-          <p>• {L('Нельзя использовать однокоренные слова', 'No root words allowed')}</p>
-          <p>• {L('Нельзя показывать жестами', 'No gestures allowed')}</p>
-          <p>• {L('Пропуск — слово остаётся в шляпе', 'Skipped words stay in the hat')}</p>
+          <p>{L('Нельзя использовать однокоренные слова', 'No root words allowed')}</p>
+          <p>{L('Нельзя показывать жестами', 'No gestures allowed')}</p>
+          <p>{L('Пропуск — слово остаётся в шляпе', 'Skipped words stay in the hat')}</p>
         </div>
 
         <button onClick={startTurn}
